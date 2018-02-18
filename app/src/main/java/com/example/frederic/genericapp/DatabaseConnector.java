@@ -3,17 +3,16 @@
 */
 package com.example.frederic.genericapp;
 
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-//import org.json.simple.parser.JSONParser;
+
 
 /**
  * Created by Frederic on 2/15/2018.
@@ -21,14 +20,19 @@ import java.net.SocketAddress;
 
 /*
     Class to handle connections to the database PostgreSQL, should be used in a thread
+<<<<<<< HEAD
     Factory Design pattern used to output relevant class
+=======
+>>>>>>> 2d946dd69eb7a7431ae5748bcd7e2827522647b4
     TODO: AWAIT RESTful WEB SERVICE IMPLEMENTATION
 */
 public class DatabaseConnector {
     private static final String SERVERIP = "8.8.8.8";
     private static final int PORTNO = 5432;
 
+
     // TODO: Sync with RESTful Web Service
+
     public boolean checkConnection(){
         // TCP/HTTP/DNS (depending on the port, 53=DNS, 80=HTTP, etc.)
         try {
@@ -43,6 +47,7 @@ public class DatabaseConnector {
         } catch (IOException e) { return false; }
 
     }
+
     // TODO: Parse JSON file, and output relevant class, class should have an ID identifier
     public RestaurantMenu parseJSON(String s){
         /*
