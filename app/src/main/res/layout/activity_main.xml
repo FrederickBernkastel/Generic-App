@@ -29,6 +29,10 @@
         android:text="@string/main_activity_guest_button"
 
         android:onClick="onGuestButtonClick" />
+    <TextView
+        android:layout_height = "wrap_content"
+        />
+
 
 
 
