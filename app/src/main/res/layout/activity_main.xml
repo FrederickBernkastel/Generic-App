@@ -18,6 +18,7 @@
         android:textSize="50sp"
         android:textColor="@android:color/background_dark"
 
+
         />
     <Button
         android:id="@+id/guest_button"
@@ -27,6 +28,8 @@
         android:layout_alignParentBottom="true"
         android:text="@string/main_activity_guest_button"
         android:onClick="onGuestButtonClick" />
+
+
 
 
 </RelativeLayout>
