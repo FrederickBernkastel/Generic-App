@@ -41,10 +41,8 @@ public class MainActivity extends Activity {
         guestButton.setLayoutParams(params);
 
     }
-
     public void onGuestButtonClick(View v){
-        Context context = v.getContext();
-        Intent intent = new Intent(context, RestaurantTableInputActivity.class);
+        Intent intent = new Intent(MainActivity.this, RestaurantTableInputActivity.class);
         startActivity(intent);
     }
 
