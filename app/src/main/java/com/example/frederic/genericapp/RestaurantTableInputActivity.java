@@ -107,8 +107,8 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
                 ((Button) findViewById(R.id.backConfirmButton)).setText(R.string.button_back);
             }
             if(viewId==10){
-                for(;textViewListPtr>=0;textViewListPtr--){
-                    textView = textViewList.get(textViewListPtr);
+                for(;textViewListPtr>0;){
+                    textView = textViewList.get(--textViewListPtr);
                     textView.setText("-");
                 }
                 textViewListPtr=0;
