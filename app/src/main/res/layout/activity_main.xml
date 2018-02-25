@@ -28,11 +28,5 @@
         android:layout_alignParentBottom="true"
         android:text="@string/main_activity_guest_button"
         android:onClick="onGuestButtonClick" />
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
-
-
 
 </RelativeLayout>
