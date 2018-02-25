@@ -4,52 +4,43 @@
 package com.example.frederic.genericapp;
 
 
+import android.os.AsyncTask;
+import android.util.JsonReader;
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.URL;
+import java.util.stream.Collectors;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
-/**
- * Created by Frederic on 2/15/2018.
- */
+
 
 /*
     Class to handle connections to the database PostgreSQL, should be used in a thread
-<<<<<<< HEAD
-    Factory Design pattern used to output relevant class
-=======
->>>>>>> 2d946dd69eb7a7431ae5748bcd7e2827522647b4
+    Created by: Frederick Bernkastel
     TODO: AWAIT RESTful WEB SERVICE IMPLEMENTATION
 */
-public class DatabaseConnector {
-    private static final String SERVERIP = "8.8.8.8";
-    private static final int PORTNO = 5432;
+class DatabaseConnector {
+    //TODO: change url
+    private static final String SERVERURLSTRING = "www.INSERTURL.com";
+    private static final String CHARSET = "UTF-8";
+    
+    
 
-
-    // TODO: Sync with RESTful Web Service
-
-    public boolean checkConnection(){
-        // TCP/HTTP/DNS (depending on the port, 53=DNS, 80=HTTP, etc.)
-        try {
-            int timeoutMs = 1500;
-            Socket sock = new Socket();
-            SocketAddress sockaddr = new InetSocketAddress(SERVERIP,PORTNO);
-
-            sock.connect(sockaddr, timeoutMs);
-            sock.close();
-
-            return true;
-        } catch (IOException e) { return false; }
-
-    }
-
-    // TODO: Parse JSON file, and output relevant class, class should have an ID identifier
-    public RestaurantMenu parseJSON(String s){
+    // Parse JSON file, and output relevant class, class should have an ID identifier
+    static RestaurantMenu parseJSON(String s){
         /*
             The below JSON format is updated to v1.0
             JSON FORMAT FOR INPUT REQUESTS
@@ -109,5 +100,53 @@ public class DatabaseConnector {
 
     }
 
+    private class FetchTaskInput{
+        String paylahID;
+
+    }
+
+    // AsyncTask to fetch JSON code from database
+    private static class FetchTask extends AsyncTask<FetchTaskInput, Void, FetchedObject> {
+        @Override
+        protected FetchedObject doInBackground(FetchTaskInput... params) {
+            FetchTaskInput FetchTaskInput = params[0];
+            String paylahID = FetchTaskInput.paylahID;
+            FetchedObject fetchedObject;
+            try {
+                // Create URL
+                URL serverURL = new URL(SERVERURLSTRING);
+                // Create connection
+                HttpsURLConnection myConnection = (HttpsURLConnection) serverURL.openConnection();
+
+                // TODO: Set request Headers
+                myConnection.setRequestProperty("User-Agent", paylahID);
+
+                if (myConnection.getResponseCode() == 200) {
+                    // Connection success, read json string
+                    InputStreamReader responseBodyReader = new InputStreamReader(myConnection.getInputStream(), CHARSET);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String response;
+
+                    BufferedReader bufferedReader = new BufferedReader(responseBodyReader);
+                    while ((response = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(response);
+                    }
+                    response = stringBuilder.toString();
+                    fetchedObject=parseJSON(response);
+
+                } else {
+                    // Connection failed
+                    throw new IOException();
+                }
+
+            } catch (IOException e){
+                Log.e("Server Error","Error connecting to server in DatabaseConnector");
+                return null;
+            }
+            return fetchedObject;
+        }
+
+
+    }
 
 }

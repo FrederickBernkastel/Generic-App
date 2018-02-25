@@ -11,7 +11,7 @@ import java.util.Locale;
  * On 2/17/2018
  */
 
-public class RestaurantMenu {
+class RestaurantMenu extends FetchedObject {
     String name;
     URL imageURL;
     ArrayList<MenuItem> menu;
