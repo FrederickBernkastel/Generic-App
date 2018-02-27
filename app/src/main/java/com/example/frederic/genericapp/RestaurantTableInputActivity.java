@@ -2,7 +2,9 @@ package com.example.frederic.genericapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -11,6 +13,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,6 +23,8 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
     private final int NUMOFDIGITS = 6;
     private ArrayList<TextView> textViewList;
     private int textViewListPtr=0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +87,23 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
             grid.addView(button);
         }
 
+       /* int imgID = 1;
+        int imageKey = getResources().getIdentifier("img"+1, "drawable", getPackageName());
 
+        ImageView newImage = new ImageView(this);
+        newImage.setId(imgID);
+        newImage.setImageResource(imageKey);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(newImage.getResources(), newImage.getId(), options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+        String imageType = options.outMimeType;
+
+        newImage.setImageBitmap(
+                ImageResize.decodeSampledBitmapFromResource(newImage.getResources(), newImage.getId(), imageHeight, imageWidth));
+                */
     }
     public void onKeypadButtonClick(View v){
         int viewId = v.getId();
