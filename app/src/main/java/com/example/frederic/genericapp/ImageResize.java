@@ -4,6 +4,10 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -12,9 +16,17 @@ import java.net.URL;
  * Created by nixsterchan on 26/2/2018.
  */
 
-public class ImageResize {
+public class ImageResize extends AppCompatActivity {
 
-    public static Drawable pullImageFromDatabase (String url){
+    /* TODO: 28/2/2018
+      - Pull image from URL
+      - Get its resource ID
+      - Try using Picasso
+      - Try out with resize function
+       */
+
+
+     public static Drawable pullImageFromDatabase (String url){
         try{
             InputStream inputStream = (InputStream) new URL(url).getContent();
             Drawable d = Drawable.createFromStream(inputStream, "src name");
@@ -24,20 +36,25 @@ public class ImageResize {
         }
     }
 
-    /*public static Bitmap scaleDown(Bitmap realImage, float maxImageSize,
-                                   boolean filter) {
-        float ratio = Math.min(
-                (float) maxImageSize / realImage.getWidth(),
-                (float) maxImageSize / realImage.getHeight());
-        int width = Math.round((float) ratio * realImage.getWidth());
-        int height = Math.round((float) ratio * realImage.getHeight());
 
-        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
-                height, filter);
-        return newBitmap;
+  /*  protected void loadImageFromUrl (String url){
+        ImageView imageView = null;
+        Picasso.with(getApplicationContext()).load(url).placeholder(R.mipmap.ic_launcher)
+                .error(R.mipmap.ic_launcher) //if error
+                .into(imageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+        imageView.setTag(R.drawable.button_cancel);
+        return (Integer) imageView.getTag();
     }*/
-
-    // Bit factory
 
 
 
@@ -58,15 +75,16 @@ public class ImageResize {
                 inSampleSize *= 2;
             }
         }
-
         return inSampleSize;
 
     }
 
+    // Main function to call for image resize.
+    // Parameters to use are in the order ( getResources(), R.id.blahblah, int width that you want, int height that you want
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
                                                          int reqWidth, int reqHeight) {
 
-        // First decode with inJustDecodeBounds=true to check dimensions
+        // Decode with inJustDecodeBounds = true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeResource(res, resId, options);
@@ -78,6 +96,5 @@ public class ImageResize {
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeResource(res, resId, options);
     }
-
 
 }

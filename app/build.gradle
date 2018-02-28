@@ -40,4 +40,7 @@ dependencies {
     testCompile "org.robolectric:robolectric:3.4"
     compile 'com.googlecode.json-simple:json-simple:1.1'
 
+    // Add Picasso Library
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
 }
