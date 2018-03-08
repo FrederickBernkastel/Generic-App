@@ -29,4 +29,5 @@
         android:text="@string/main_activity_guest_button"
         android:onClick="onGuestButtonClick" />
 
+
 </RelativeLayout>
