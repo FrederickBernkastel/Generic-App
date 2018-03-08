@@ -58,13 +58,13 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
 
         int gridSize = (height/7 < width/4)? height/7: width/4;
 
-        Drawable newDrawing = ImageResize.pullImageFromDatabase("https://images-na.ssl-images-amazon.com/images/I/71m2NvJyIVL.png");
-
+        String url = "http://www.qygjxz.com/data/out/9/4575547-animal-picture.jpg";
+        //Drawable newDrawing = ImageResize.pullImageFromDatabase("https://images-na.ssl-images-amazon.com/images/I/71m2NvJyIVL.png");
         // Resizing of image and putting it into imageview
         ImageView mTextView = new ImageView(this);
         BitmapDrawable drawable;
         BitmapDrawable[] drawList = new BitmapDrawable[3]; // to store resized drawables
-        int[] resourceList = new int[]{R.drawable.spiral_circle, R.drawable.close_red, R.drawable.delete};
+        int[] resourceList = new int[]{R.drawable.close_red, R.drawable.spiral_circle,  R.drawable.delete};
 
         for ( int i = 0; i < 3; i++){
             mTextView.setImageBitmap(
@@ -82,7 +82,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
             button.setId(i);
             button.setText(String.valueOf(i));
             button.setHeight(gridSize);
-            button.setBackground(drawList[0]);
+            button.setBackground(drawList[1]);
             button.setWidth(gridSize);
             button.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
@@ -93,7 +93,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
         }
         // IDs for button X,0,del
         int[] buttonId = new int[]{10,0,11};
-        Drawable[] drawableId = new Drawable[]{drawList[1], drawList[0], drawList[2]};
+        //Drawable[] drawableId = new Drawable[]{drawList[1], drawList[0], drawList[2]};
         // Dynamically create buttons X,0,del
         for(int i =0;i<3;i++){
             Button button = new Button(this);
@@ -102,7 +102,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
                 button.setText("0");
             }
             button.setHeight(gridSize);
-            button.setBackground(drawableId[i]);
+            button.setBackground(drawList[i]);
             button.setWidth(gridSize);
             button.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {

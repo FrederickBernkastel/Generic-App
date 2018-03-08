@@ -1,5 +1,6 @@
 package com.example.frederic.genericapp;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,47 +17,34 @@ import java.net.URL;
  * Created by nixsterchan on 26/2/2018.
  */
 
-public class ImageResize extends AppCompatActivity {
-
-    /* TODO: 28/2/2018
-      - Pull image from URL
-      - Get its resource ID
-      - Try using Picasso
-      - Try out with resize function
-       */
+public class ImageResize extends Object {
 
 
-     public static Drawable pullImageFromDatabase (String url){
-        try{
-            InputStream inputStream = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(inputStream, "src name");
-            return d;
-        } catch (Exception e){
-            return null;
-        }
+
+    // FOR PULLING IMAGE FROM URL TO LOAD INTO AN IMAGEVIEW
+
+    public static void loadImageByUrl(Context context, String url, ImageView newImage, int theWidth, int theHeight){
+        Picasso.with(context).load(url).resize(theWidth,theHeight).into(newImage);
     }
 
+    // FOR RESIZING OF DRAWABLES IN LOCAL DRAWABLES FOLDER
+    // Main function to call for image resize.
+    // Parameters to use are in the order ( getResources(), R.id.blahblah, int width that you want, int height that you want
+    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                         int reqWidth, int reqHeight) {
 
-  /*  protected void loadImageFromUrl (String url){
-        ImageView imageView = null;
-        Picasso.with(getApplicationContext()).load(url).placeholder(R.mipmap.ic_launcher)
-                .error(R.mipmap.ic_launcher) //if error
-                .into(imageView, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
+        // Decode with inJustDecodeBounds = true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(res, resId, options);
 
-                    }
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
-                    @Override
-                    public void onError() {
-
-                    }
-                });
-        imageView.setTag(R.drawable.button_cancel);
-        return (Integer) imageView.getTag();
-    }*/
-
-
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeResource(res, resId, options);
+    }
 
     public static int calculateInSampleSize(BitmapFactory.Options options , int reqWidth, int reqHeight){
         final int height = options.outHeight;
@@ -79,22 +67,5 @@ public class ImageResize extends AppCompatActivity {
 
     }
 
-    // Main function to call for image resize.
-    // Parameters to use are in the order ( getResources(), R.id.blahblah, int width that you want, int height that you want
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                         int reqWidth, int reqHeight) {
-
-        // Decode with inJustDecodeBounds = true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(res, resId, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeResource(res, resId, options);
-    }
 
 }
