@@ -46,5 +46,18 @@ public class DatabaseConnectorTest {
         assertEquals("I am French",item.description);
         assertEquals(new URL("https://www.link2.com"),item.imageURL);
     }
+    // TODO: Test this test case
+    @Test
+    public void FetchTask() throws Exception{
+        DatabaseConnector.FetchTaskInput input = new DatabaseConnector.FetchTaskInput("1");
+        // Block thread until output is received
+        RestaurantMenu output = (RestaurantMenu) new DatabaseConnector.FetchTask().execute(input).get();
+        //new DatabaseConnector.FetchTask().execute(input).get();
 
+        System.out.println(output.name);
+        for (int i =0;i<output.menu.size();i++){
+            System.out.println(output.menu.get(0).name);
+        }
+
+    }
 }
