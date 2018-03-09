@@ -22,15 +22,21 @@ import java.net.URLConnection;
 /*
     Class to handle connections to the database PostgreSQL, should be used in a thread
     Created by: Frederick Bernkastel
-    TODO: AWAIT RESTful WEB SERVICE IMPLEMENTATION
+
 */
 class DatabaseConnector {
-    //TODO: change url
-    private static final String SERVERURLSTRING = "http://10.12.79.231:4995/api/menu";
+
+    private static final String SERVERURLSTRING = "http://10.12.184.102:4995/api";
     private static final String CHARSET = "UTF-8";
 
+    public enum FetchMode{
+        MENU,
+        TABLENO,
+        PEOPLENO
+    }
+
     // Parse JSON file, and output relevant class, class should have an ID identifier
-    static RestaurantMenu parseJSON(String s){
+    static RestaurantMenu parseJSONMenu(String s){
         /*
             The below JSON format is updated to v1.0
             JSON FORMAT FOR INPUT REQUESTS
@@ -39,11 +45,12 @@ class DatabaseConnector {
                 "imagehyperlink":"www.link.com",
                 "menu": [
                     {
-                        "itemid": 999,
+                        "food_id": 999,
                         "price": 5,
                         "name":"Fries",
                         "description":"I am French",
-                        "imagehyperlink":"www.link.com"
+                        "image_link":"www.link.com",
+                        "food_category":"Main"
                     },
                     {
                         ...
@@ -55,12 +62,12 @@ class DatabaseConnector {
                 "tableno":111,
                 "orders": [
                     {
-                        "itemid":999,
+                        "food_id":999,
                         "quantity":1,
                         "specialrequest":""
                     } ,
                     {
-                        "itemid":1000,
+                        "food_id":1000,
                         "quantity":0,
                         "specialrequest:"No fish"
                     }
@@ -76,11 +83,11 @@ class DatabaseConnector {
             JSONArray menuItems = restaurantJSON.getJSONArray("menu");
             for (int i=0; i<menuItems.length(); i++){
                 JSONObject item = menuItems.getJSONObject(i);
-                int id = item.getInt("itemid");
+                int id = item.getInt("food_id");
                 int price = item.getInt("price");
                 String name = item.getString("name");
                 String description = item.getString("description");
-                url = item.getString("imagehyperlink");
+                url = item.getString("image_link");
                 menu.addItem(id,price,name,description,url);
             }
             return menu;
@@ -92,32 +99,39 @@ class DatabaseConnector {
 
     // Input information for fetching data
     static class FetchTaskInput{
-        FetchTaskInput(String paylahID){
-            this.paylahID = paylahID;
-        }
         String paylahID;
-
+        String ServerURLString;
+        FetchMode  fetchMode;
+        FetchTaskInput(String paylahID,String ServerURLTail,FetchMode fetchMode){
+            this.paylahID = paylahID;
+            this.ServerURLString = SERVERURLSTRING + ServerURLTail;
+            this.fetchMode = fetchMode;
+        }
     }
 
     // AsyncTask to fetch a restautant's JSON code from database
     static class FetchTask extends AsyncTask<FetchTaskInput, Void, FetchedObject> {
+        public AsyncFetchResponse delegate=null;
+        FetchTask(AsyncFetchResponse delegate){
+            this.delegate = delegate;
+        }
         @Override
         protected FetchedObject doInBackground(FetchTaskInput... params) {
-            FetchTaskInput FetchTaskInput = params[0];
-            String paylahID = FetchTaskInput.paylahID;
-            FetchedObject fetchedObject;
+            FetchTaskInput fetchTaskInput = params[0];
+            String paylahID = fetchTaskInput.paylahID;
+            FetchedObject fetchedObject = new FetchedObject();
             try {
                 // Create URL
-                URL serverURL = new URL(SERVERURLSTRING);
+                URL serverURL = new URL(fetchTaskInput.ServerURLString);
+
                 // Create connection
-                //HttpsURLConnection myConnection = (HttpsURLConnection) serverURL.openConnection();
                 HttpURLConnection myConnection = (HttpURLConnection) serverURL.openConnection();
 
-                // TODO: Set request Headers
+                // Set request Headers
                 myConnection.setRequestProperty("User-Agent", paylahID);
 
                 if (myConnection.getResponseCode() == 200) {
-                    // Connection success, read json string
+                    // Connection success, read string
                     InputStreamReader responseBodyReader = new InputStreamReader(myConnection.getInputStream(), CHARSET);
                     StringBuilder stringBuilder = new StringBuilder();
                     String response;
@@ -127,7 +141,20 @@ class DatabaseConnector {
                         stringBuilder.append(response);
                     }
                     response = stringBuilder.toString();
-                    fetchedObject=parseJSON(response);
+
+                    // Handle different GET requests
+                    switch(fetchTaskInput.fetchMode){
+                        case MENU:
+                            fetchedObject = parseJSONMenu(response);
+                            break;
+                        case TABLENO:
+                            fetchedObject.response = response;
+                            break;
+                        case PEOPLENO:
+                            break;
+
+                    }
+
 
                 } else {
                     // Connection failed
@@ -141,7 +168,24 @@ class DatabaseConnector {
             return fetchedObject;
         }
 
-
+        @Override
+        protected void onPostExecute(FetchedObject fetchedObject) {
+            super.onPostExecute(fetchedObject);
+            if (delegate!=null) {
+                delegate.fetchFinish(fetchedObject);
+            }
+        }
     }
 
+    // Output information for posting data
+    static class PostTaskOutput{
+        String ServerURLString;
+        String JSONData;
+        String paylahID;
+        PostTaskOutput(String paylahID,String ServerURLTail,String JSONData){
+            this.paylahID = paylahID;
+            this.ServerURLString = SERVERURLSTRING + ServerURLTail;
+            this.JSONData = JSONData;
+        }
+    }
 }

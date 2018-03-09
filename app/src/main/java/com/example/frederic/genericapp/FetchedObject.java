@@ -7,4 +7,5 @@ package com.example.frederic.genericapp;
  */
 // Parent object of everything fetched from database
 class FetchedObject {
+    String response;
 }

@@ -7,14 +7,16 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class RestaurantMainActivity extends AppCompatActivity {
-
+public class RestaurantMainActivity extends AppCompatActivity implements AsyncFetchResponse{
+    RestaurantMenu menu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +25,7 @@ public class RestaurantMainActivity extends AppCompatActivity {
         // Get screen size
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
         // Set icon sizes
@@ -47,26 +50,30 @@ public class RestaurantMainActivity extends AppCompatActivity {
             imageView.setImageBitmap(d);
         }
 
-
+        //Test
+        Intent intent = getIntent();
+        String tablenumber = intent.getStringExtra("tablenumber");
+        DatabaseConnector.FetchTaskInput input = new DatabaseConnector.FetchTaskInput("1","/menu?tablenumber="+tablenumber,DatabaseConnector.FetchMode.MENU);
+        new DatabaseConnector.FetchTask(this).execute(input);
 
     }
-    // TODO: Backtrack to MainActivity, iff nothing ordered yet
+    // TODO: Backtrack to MainActivity, iff nothing ordered yet, or no time
     public void onRestaurantMainBackClick(View v){
 
     }
-    // TODO: Backtrack to MainActivity, iff nothing ordered yet
+    // TODO: Implement
     public void onRestaurantMainHotDishClick(View v){
 
     }
-    // TODO: Backtrack to MainActivity, iff nothing ordered yet
+    // TODO: Implement
     public void onRestaurantMainMenuClick(View v){
 
     }
-    // TODO: Backtrack to MainActivity, iff nothing ordered yet
+    // TODO: Implement
     public void onRestaurantMainOrdersClick(View v){
 
     }
-    // TODO: Backtrack to MainActivity, iff nothing ordered yet
+    // TODO: Implement
     public void onRestaurantMainBillClick(View v){
 
     }
@@ -75,5 +82,32 @@ public class RestaurantMainActivity extends AppCompatActivity {
     public void onBackPressed() {
         //TODO: Allow onBackPressed iff no orders sent to kitchen, or no time
         //super.onBackPressed();
+    }
+
+    @Override
+    public void fetchFinish(FetchedObject output) {
+        // Get screen size
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+
+        try {
+            RestaurantMenu menu = (RestaurantMenu) output;
+            this.menu = menu;
+            // Display data from database in resized widgets
+            TextView restaurantNameTextView = findViewById(R.id.restaurant_main_activity_name);
+            restaurantNameTextView.setText(menu.name);
+            restaurantNameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,(menu.name.length()<20)? Math.round(75-menu.name.length()*2.5): 25);
+            ImageResize.loadImageByUrl(
+                    this,
+                    menu.imageURL.toString(),
+                    ((ImageView) findViewById(R.id.restaurant_main_activity_image)),
+                    width,
+                    height/8*3
+            );
+        } catch (Exception e){
+            System.out.println("FAIL");
+        }
     }
 }

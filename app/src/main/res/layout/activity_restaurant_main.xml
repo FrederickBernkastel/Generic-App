@@ -27,9 +27,9 @@
             android:layout_width="wrap_content"
             android:layout_centerHorizontal="true"
 
-            android:text="Testing text"
+            android:text="Default name"
             android:textColor="#000000"
-            android:textSize="40sp" />
+            android:textSize="25sp" />
 
     </RelativeLayout>
     <ImageView

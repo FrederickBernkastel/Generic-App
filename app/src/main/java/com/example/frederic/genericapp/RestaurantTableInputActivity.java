@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class RestaurantTableInputActivity extends AppCompatActivity {
+public class RestaurantTableInputActivity extends AppCompatActivity implements AsyncFetchResponse {
     private final int NUMOFDIGITS = 6;
     private ArrayList<TextView> textViewList;
     private int textViewListPtr=0;
@@ -161,9 +161,19 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
         if(text.equals(getResources().getString(R.string.button_back))) {
             finish();
         } else {
+            // TODO: Use DatabaseConnector.FetchTask with FetchTaskInput.FetchMode = TABLENO and PEOPLENO
+
+            // TODO: When starting RestaurantMainActivity, put String tablenumber into intent and Boolean istimed into Intent Extra
             Intent intent = new Intent(RestaurantTableInputActivity.this, RestaurantMainActivity.class);
+            // TESTING CODE ONLY
+            intent.putExtra("tablenumber",49);
             startActivity(intent);
         }
     }
 
+    // TODO: Handle output of DatabaseConnector.FetchTask
+    @Override
+    public void fetchFinish(FetchedObject output) {
+
+    }
 }
