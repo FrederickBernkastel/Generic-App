@@ -6,6 +6,17 @@
     <string name="button_back">Back</string>
     <string name="button_confirm">Confirm</string>
     <string name="button_cancel">⮽</string>
+    <string name="label_hot_dishes">Hot Dishes</string>
+    <string name="label_menu">Menu</string>
+    <string name="label_orders">My Orders</string>
+    <string name="label_bill">My Bill</string>
+
+    <string name="credits">
+        Chef icon made by Monkik from flaticon.com\n
+        Menu icon made by Freepik from flaticon.com\n
+        Orders icon made by Freepik from flaticon.com\n
+        Bill icon made by Gregor Cresnar from flaticon.com\n
+    </string>>
 
 
 </resources>

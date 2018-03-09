@@ -159,7 +159,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
         if(text.equals(getResources().getString(R.string.button_back))) {
             finish();
         } else {
-            Intent intent = new Intent(RestaurantTableInputActivity.this, TrollActivity.class);
+            Intent intent = new Intent(RestaurantTableInputActivity.this, RestaurantMainActivity.class);
             startActivity(intent);
         }
     }

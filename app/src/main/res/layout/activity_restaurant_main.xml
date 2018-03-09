@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.frederic.genericapp.RestaurantMainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/restaurant_main_activity_back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@+id/restaurant_main_activity_name"
+            android:onClick="onRestaurantMainBackClick"
+            android:scaleType="fitXY"
+            android:src="@drawable/activity_restautant_main__icon_back"
+            android:padding="20dp" />
+
+        <TextView
+            android:id="@+id/restaurant_main_activity_name"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+
+            android:text="Testing text"
+            android:textColor="#000000"
+            android:textSize="40sp" />
+
+    </RelativeLayout>
+    <ImageView
+        android:id="@+id/restaurant_main_activity_image"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:scrollbars="vertical">
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="1"
+            >
+            <TableRow
+                android:onClick="onRestaurantMainHotDishClick">
+                <ImageView
+                    android:id="@+id/restaurant_main_activity_chef_image"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:src="@drawable/activity_restautant_main__icon_chef"
+                    android:scaleType="fitXY"
+                    android:padding="10dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_hot_dishes"
+                    android:textColor="#000000"
+                    android:textSize="30sp"
+                    />
+            </TableRow>
+            <TableRow
+                android:onClick="onRestaurantMainMenuClick">
+                <ImageView
+                    android:id="@+id/restaurant_main_activity_menu_image"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:src="@drawable/activity_restautant_main__icon_menu"
+                    android:scaleType="fitXY"
+                    android:padding="10dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_menu"
+                    android:textColor="#000000"
+                    android:textSize="30sp"
+                    />
+            </TableRow>
+            <TableRow
+                android:onClick="onRestaurantMainOrdersClick">
+                <ImageView
+                    android:id="@+id/restaurant_main_activity_orders_image"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:src="@drawable/activity_restautant_main__icon_orders"
+                    android:scaleType="fitXY"
+                    android:padding="10dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_orders"
+                    android:textColor="#000000"
+                    android:textSize="30sp"
+                    />
+            </TableRow>
+            <TableRow
+                android:onClick="onRestaurantMainBillClick">
+                <ImageView
+                    android:id="@+id/restaurant_main_activity_bill_image"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:src="@drawable/activity_restautant_main__icon_bill"
+                    android:scaleType="fitXY"
+                    android:padding="10dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_bill"
+                    android:textColor="#000000"
+                    android:textSize="30sp"
+                    />
+            </TableRow>
+        </TableLayout>
+
+    </ScrollView>
+</LinearLayout>
