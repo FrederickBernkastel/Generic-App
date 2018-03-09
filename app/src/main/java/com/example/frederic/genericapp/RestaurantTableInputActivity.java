@@ -64,7 +64,9 @@ public class RestaurantTableInputActivity extends AppCompatActivity {
         ImageView mTextView = new ImageView(this);
         BitmapDrawable drawable;
         BitmapDrawable[] drawList = new BitmapDrawable[3]; // to store resized drawables
-        int[] resourceList = new int[]{R.drawable.close_red, R.drawable.spiral_circle,  R.drawable.delete};
+        int[] resourceList = new int[]{R.drawable.activity_restaurant_table_input__cancel,
+                R.drawable.activity_restaurant_table_input__spiral_circle,
+                R.drawable.activity_restaurant_table_input__delete};
 
         for ( int i = 0; i < 3; i++){
             mTextView.setImageBitmap(
