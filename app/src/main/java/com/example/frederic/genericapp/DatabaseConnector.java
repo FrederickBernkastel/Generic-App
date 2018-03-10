@@ -19,11 +19,10 @@ import java.net.URL;
 import java.net.URLConnection;
 
 
-/*
-    Class to handle connections to the database PostgreSQL, should be used in a thread
-    Created by: Frederick Bernkastel
-
-*/
+/**
+ * Class to handle connections to the database PostgreSQL, should be used in a thread
+ * Created by: Frederick Bernkastel
+ */
 class DatabaseConnector {
 
     private static final String SERVERURLSTRING = "http://10.12.184.102:4995/api";
@@ -35,7 +34,12 @@ class DatabaseConnector {
         PEOPLENO
     }
 
-    // Parse JSON file, and output relevant class, class should have an ID identifier
+
+    /**
+     * Parse JSON file representing the menu, and output RestaurantMenu class, class should have an ID identifier
+     * @param s     Json String to be parsed
+     * @return      RestaurantMenu containing information in JSON string
+     */
     static RestaurantMenu parseJSONMenu(String s){
         /*
             The below JSON format is updated to v1.0
@@ -97,7 +101,10 @@ class DatabaseConnector {
 
     }
 
-    // Input information for fetching data
+
+    /**
+     * Input information for fetching data from database using AsyncTask
+     */
     static class FetchTaskInput{
         String paylahID;
         String ServerURLString;
@@ -109,7 +116,10 @@ class DatabaseConnector {
         }
     }
 
-    // AsyncTask to fetch a restautant's JSON code from database
+
+    /**
+     * AsyncTask to fetch a restautant's JSON code from database
+     */
     static class FetchTask extends AsyncTask<FetchTaskInput, Void, FetchedObject> {
         public AsyncFetchResponse delegate=null;
         FetchTask(AsyncFetchResponse delegate){
@@ -178,6 +188,10 @@ class DatabaseConnector {
     }
 
     // Output information for posting data
+
+    /**
+     * Output information for posting data using AsyncTask
+     */
     static class PostTaskOutput{
         String ServerURLString;
         String JSONData;

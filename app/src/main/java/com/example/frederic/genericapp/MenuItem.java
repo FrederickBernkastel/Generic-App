@@ -2,12 +2,11 @@ package com.example.frederic.genericapp;
 
 import java.net.URL;
 
-/**
- * Project GenericApp
- * Created by Frederic
- * On 2/17/2018
- */
 
+/**
+ * Class for each menu item
+ * Created by: Frederick Bernkastel
+ */
 public class MenuItem {
     int id;
     double price;

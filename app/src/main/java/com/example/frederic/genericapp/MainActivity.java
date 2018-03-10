@@ -16,6 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+/**
+ * Main menu of activity
+ * Created by: Frederick Bernkastel
+ */
 public class MainActivity extends Activity {
     SharedPreferences prefs = null;
     @Override
