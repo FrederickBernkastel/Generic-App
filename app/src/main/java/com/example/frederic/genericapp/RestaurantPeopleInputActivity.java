@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class RestaurantTableInputActivity extends AppCompatActivity implements AsyncFetchResponse {
-    private final int NUMOFDIGITS = 6;
+public class RestaurantPeopleInputActivity extends AppCompatActivity implements AsyncFetchResponse {
+    private final int NUMOFDIGITS = 2;
     private ArrayList<TextView> textViewList;
     private int textViewListPtr=0;
 
@@ -25,7 +25,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_restaurant_table_input);
+        setContentView(R.layout.activity_restaurant_people_input);
 
         // Get screen size
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -158,7 +158,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
             // TODO: Use DatabaseConnector.FetchTask with FetchTaskInput.FetchMode = TABLENO and PEOPLENO
 
             // TODO: When starting RestaurantMainActivity, put String tablenumber into intent and Boolean istimed into Intent Extra
-            Intent intent = new Intent(RestaurantTableInputActivity.this, RestaurantPeopleInputActivity.class);
+            Intent intent = new Intent(RestaurantPeopleInputActivity.this, RestaurantMainActivity.class);
             // TESTING CODE ONLY
             intent.putExtra("tablenumber",49);
             startActivity(intent);

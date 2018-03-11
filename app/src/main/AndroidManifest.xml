@@ -25,8 +25,14 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".TrollActivity"></activity>
-        <activity android:name=".RestaurantMainActivity"></activity>
+        <activity android:name=".TrollActivity" />
+        <activity android:name=".RestaurantMainActivity" />
+        <activity android:name=".RestaurantPeopleInputActivity"
+            android:label="GenericApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

@@ -3,6 +3,7 @@
     <string name="main_activity_guest_button">Guest</string>
     <string name="button_del">⮨</string>
     <string name="insert_table_number">Insert Table Number</string>
+    <string name="insert_number_of_people">Insert Number of People</string>
     <string name="button_back">Back</string>
     <string name="button_confirm">Confirm</string>
     <string name="button_cancel">⮽</string>
