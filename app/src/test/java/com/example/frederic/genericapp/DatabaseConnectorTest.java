@@ -15,11 +15,11 @@ import org.robolectric.annotation.Config;
 
 @Config(constants = BuildConfig.class, sdk=21)
 @RunWith(RobolectricTestRunner.class)
-public class DatabaseConnectorTest {
+public class DatabaseConnectorTest implements AsyncFetchResponse {
     @Test
     public void parseJSON() throws Exception {
         String s;
-        // Create JSON object, and converts it to JSON string INVESTIGATE ROBOELECTRIC
+        // Create JSON object, and converts it to JSON string
 
         JSONObject json=new JSONObject();
         json.put("name","Ugandan Cuisine");
@@ -36,7 +36,7 @@ public class DatabaseConnectorTest {
         s = json.toString();
 
         DatabaseConnector dc = new DatabaseConnector();
-        RestaurantMenu menu = dc.parseJSON(s);
+        RestaurantMenu menu = dc.parseJSONMenu(s);
         MenuItem item = menu.menu.get(0);
         assertEquals("Ugandan Cuisine",menu.name);
         assertEquals(new URL("https://www.link1.com"),menu.imageURL);
@@ -46,18 +46,46 @@ public class DatabaseConnectorTest {
         assertEquals("I am French",item.description);
         assertEquals(new URL("https://www.link2.com"),item.imageURL);
     }
-    // TODO: Test this test case
+    // TODO: Test this test case (EveryBranch WhiteBox Test)
     @Test
     public void FetchTask() throws Exception{
-        DatabaseConnector.FetchTaskInput input = new DatabaseConnector.FetchTaskInput("1");
-        // Block thread until output is received
-        RestaurantMenu output = (RestaurantMenu) new DatabaseConnector.FetchTask().execute(input).get();
-        //new DatabaseConnector.FetchTask().execute(input).get();
+        DatabaseConnector.FetchTaskInput input;
 
+        // Test FetchMode.TABLENO
+        input = new DatabaseConnector.FetchTaskInput("1",1,DatabaseConnector.FetchMode.TABLENO);
+        System.out.println(new DatabaseConnector.FetchTask(this).execute(input).get().response);
+
+        // Test FetchMode.PEOPLENO
+        input = new DatabaseConnector.FetchTaskInput("1",1,DatabaseConnector.FetchMode.PEOPLENO);
+        assertNull(new DatabaseConnector.FetchTask(this).execute(input).get().response);
+
+        // Test FetchMode.MENU
+        input = new DatabaseConnector.FetchTaskInput("1",DatabaseConnector.FetchMode.MENU);
+        RestaurantMenu output = (RestaurantMenu) new DatabaseConnector.FetchTask(this).execute(input).get();
         System.out.println(output.name);
         for (int i =0;i<output.menu.size();i++){
-            System.out.println(output.menu.get(0).name);
+            System.out.println(output.menu.get(i).name);
         }
+
+        // Test incorrect FetchModes
+        try {
+            new DatabaseConnector.FetchTaskInput("1", 1, DatabaseConnector.FetchMode.MENU);
+            fail();
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        try {
+            new DatabaseConnector.FetchTaskInput("1", DatabaseConnector.FetchMode.PEOPLENO);
+            fail();
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+
+
+    }
+
+    @Override
+    public void fetchFinish(FetchedObject output){
 
     }
 }

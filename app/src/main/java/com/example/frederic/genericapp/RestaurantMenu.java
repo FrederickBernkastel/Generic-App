@@ -63,3 +63,18 @@ class RestaurantMenu extends FetchedObject {
     }
 
 }
+class MenuItem {
+    int id;
+    double price;
+    String name;
+    String description;
+    URL imageURL;
+    MenuItem(int id, double price, String name,String description,URL imageURL){
+        this.id = id;
+        this.price = price;
+        this.name = name;
+        this.description = description;
+        this.imageURL = imageURL;
+    }
+
+}

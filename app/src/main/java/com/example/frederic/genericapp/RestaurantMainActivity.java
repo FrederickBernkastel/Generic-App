@@ -15,7 +15,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class RestaurantMainActivity extends AppCompatActivity implements AsyncFetchResponse{
+public class RestaurantMainActivity extends AppCompatActivity{
     RestaurantMenu menu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +51,24 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
         }
 
         //Test
-        Intent intent = getIntent();
-        String tablenumber = intent.getStringExtra("tablenumber");
-        DatabaseConnector.FetchTaskInput input = new DatabaseConnector.FetchTaskInput("1","/menu?tablenumber="+tablenumber,DatabaseConnector.FetchMode.MENU);
-        new DatabaseConnector.FetchTask(this).execute(input);
+        try {
+            // Fetch restaurant menu from sharedPreferences
+            RestaurantMenu menu = new SharedPrefManager<RestaurantMenu>().fetchObj(getString(R.string.key_restaurant_menu),RestaurantMainActivity.this,RestaurantMenu.class);
+            this.menu = menu;
+            // Display data from database in resized widgets
+            TextView restaurantNameTextView = findViewById(R.id.restaurant_main_activity_name);
+            restaurantNameTextView.setText(menu.name);
+            restaurantNameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,(menu.name.length()<20)? Math.round(75-menu.name.length()*2.5): 25);
+            ImageResize.loadImageByUrl(
+                    this,
+                    menu.imageURL.toString(),
+                    ((ImageView) findViewById(R.id.restaurant_main_activity_image)),
+                    width,
+                    height/8*3
+            );
+        } catch (Exception e){
+            System.out.println("FAIL");
+        }
 
     }
     // TODO: Backtrack to MainActivity, iff nothing ordered yet, or no time
@@ -84,30 +98,5 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
         //super.onBackPressed();
     }
 
-    @Override
-    public void fetchFinish(FetchedObject output) {
-        // Get screen size
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
-        int width = displayMetrics.widthPixels;
 
-        try {
-            RestaurantMenu menu = (RestaurantMenu) output;
-            this.menu = menu;
-            // Display data from database in resized widgets
-            TextView restaurantNameTextView = findViewById(R.id.restaurant_main_activity_name);
-            restaurantNameTextView.setText(menu.name);
-            restaurantNameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,(menu.name.length()<20)? Math.round(75-menu.name.length()*2.5): 25);
-            ImageResize.loadImageByUrl(
-                    this,
-                    menu.imageURL.toString(),
-                    ((ImageView) findViewById(R.id.restaurant_main_activity_image)),
-                    width,
-                    height/8*3
-            );
-        } catch (Exception e){
-            System.out.println("FAIL");
-        }
-    }
 }

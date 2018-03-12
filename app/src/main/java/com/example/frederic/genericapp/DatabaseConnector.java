@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 
 
 /**
@@ -109,10 +110,35 @@ class DatabaseConnector {
         String paylahID;
         String ServerURLString;
         FetchMode  fetchMode;
-        FetchTaskInput(String paylahID,String ServerURLTail,FetchMode fetchMode){
+        FetchTaskInput(String paylahID,int number,FetchMode fetchMode) throws Exception{
             this.paylahID = paylahID;
-            this.ServerURLString = SERVERURLSTRING + ServerURLTail;
             this.fetchMode = fetchMode;
+            String ServerURLTail;
+            switch(fetchMode){
+                case TABLENO:
+                    ServerURLTail = String.format(Locale.US,"/tableno?number=%d?plid=%s",number,paylahID);
+                    break;
+                case PEOPLENO:
+                    ServerURLTail = String.format(Locale.US,"/numpeople?number=%d?plid=%s",number,paylahID);
+                    break;
+                default:
+                    throw new Exception("Invalid FetchTaskInput parameters");
+            }
+
+            this.ServerURLString = SERVERURLSTRING + ServerURLTail;
+        }
+        FetchTaskInput(String paylahID,FetchMode fetchMode) throws Exception {
+            this.paylahID = paylahID;
+            this.fetchMode = fetchMode;
+            String ServerURLTail;
+            switch(fetchMode){
+                case MENU:
+                    ServerURLTail = String.format(Locale.US,"/admin/newmenu?keycode=12345");
+                    break;
+                default:
+                    throw new Exception("Invalid FetchTaskInput parameters");
+            }
+            this.ServerURLString = SERVERURLSTRING + ServerURLTail;
         }
     }
 
@@ -187,7 +213,7 @@ class DatabaseConnector {
         }
     }
 
-    // Output information for posting data
+
 
     /**
      * Output information for posting data using AsyncTask

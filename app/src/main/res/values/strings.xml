@@ -17,7 +17,9 @@
         Menu icon made by Freepik from flaticon.com\n
         Orders icon made by Freepik from flaticon.com\n
         Bill icon made by Gregor Cresnar from flaticon.com\n
-    </string>>
+    </string>
 
+    <!-- String Keys -->
+    <string name="key_restaurant_menu">restaurant_menu</string>
 
-</resources>
+    </resources>

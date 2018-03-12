@@ -20,7 +20,7 @@ class SharedPrefManager <T>{
      * Function to save an object as a string in a SharedPreferences file
      * @param key       Key to save object under
      * @param obj       Object to be saved
-     * @param context   Activity context ( = getActivity() )
+     * @param context   Activity context ( = getActivity() or ActivityClass.this)
      * @return true
      */
     boolean saveObj(String key, T obj,Context context){
@@ -35,7 +35,7 @@ class SharedPrefManager <T>{
     /**
      *
      * @param key       Key to save object under
-     * @param context   Activity context ( = getActivity() )
+     * @param context   Activity context ( = getActivity()  or ActivityClass.this)
      * @param tClass    Class type to fetch ( Menu.class )
      * @return
      */
