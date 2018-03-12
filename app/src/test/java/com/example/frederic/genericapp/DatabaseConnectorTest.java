@@ -23,13 +23,13 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
 
         JSONObject json=new JSONObject();
         json.put("name","Ugandan Cuisine");
-        json.put("imagehyperlink","https://www.link1.com");
+        json.put("imagehyperlink","http://a57.foxnews.com/media2.foxnews.com/2016/06/09/640/360/060916_chew_crispychicken_1280.jpg");
         JSONObject obj1 = new JSONObject();
-        obj1.put("itemid",999);
-        obj1.put("price",5.);
-        obj1.put("name","Fries");
-        obj1.put("description","I am French");
-        obj1.put("imagehyperlink","https://www.link2.com");
+        obj1.put("food_id",999);
+        obj1.put("price","5");
+        obj1.put("name","Baagaa");
+        obj1.put("description","Meat so fresh, you can still hear it baa-ing");
+        obj1.put("image_link","https://lh3.googleusercontent.com/alX3SlsbUt4ZBZ1ct6efz5wxIcjM6S3Gva_pstMNXGjlFAQRr6CbpwFyFNoixBgPOGXxQi7vqC3U0CDT8oGz4lu4IZWzifs40owj_jA=w600-l68");
         JSONArray array = new JSONArray();
         array.put(obj1);
         json.put("menu",array);
@@ -41,7 +41,7 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
         assertEquals("Ugandan Cuisine",menu.name);
         assertEquals(new URL("https://www.link1.com"),menu.imageURL);
         assertEquals(999,item.id);
-        assertEquals(5,item.price,.009);
+        assertEquals("5",item.price,.009);
         assertEquals("Fries",item.name);
         assertEquals("I am French",item.description);
         assertEquals(new URL("https://www.link2.com"),item.imageURL);
@@ -60,32 +60,18 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
         assertNull(new DatabaseConnector.FetchTask(this).execute(input).get().response);
 
         // Test FetchMode.MENU
-        input = new DatabaseConnector.FetchTaskInput("1",DatabaseConnector.FetchMode.MENU);
+        input = new DatabaseConnector.FetchTaskInput("1",1,DatabaseConnector.FetchMode.MENU);
         RestaurantMenu output = (RestaurantMenu) new DatabaseConnector.FetchTask(this).execute(input).get();
         System.out.println(output.name);
         for (int i =0;i<output.menu.size();i++){
             System.out.println(output.menu.get(i).name);
         }
 
-        // Test incorrect FetchModes
-        try {
-            new DatabaseConnector.FetchTaskInput("1", 1, DatabaseConnector.FetchMode.MENU);
-            fail();
-        } catch(Exception e){
-            System.out.println(e.getMessage());
-        }
-        try {
-            new DatabaseConnector.FetchTaskInput("1", DatabaseConnector.FetchMode.PEOPLENO);
-            fail();
-        } catch(Exception e){
-            System.out.println(e.getMessage());
-        }
-
 
     }
 
-    @Override
-    public void fetchFinish(FetchedObject output){
 
+    public void fetchFinish(FetchedObject output){
+        System.out.println("Fetch Successful");
     }
 }

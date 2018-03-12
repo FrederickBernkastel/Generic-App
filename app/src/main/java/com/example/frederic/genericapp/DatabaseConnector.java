@@ -89,7 +89,7 @@ class DatabaseConnector {
             for (int i=0; i<menuItems.length(); i++){
                 JSONObject item = menuItems.getJSONObject(i);
                 int id = item.getInt("food_id");
-                int price = item.getInt("price");
+                String price = item.getString("price");
                 String name = item.getString("name");
                 String description = item.getString("description");
                 url = item.getString("image_link");
@@ -121,30 +121,21 @@ class DatabaseConnector {
                 case PEOPLENO:
                     ServerURLTail = String.format(Locale.US,"/numpeople?number=%d?plid=%s",number,paylahID);
                     break;
+                case MENU:
+                    ServerURLTail = String.format(Locale.US,"/menu?tableno=%d",number);
                 default:
                     throw new Exception("Invalid FetchTaskInput parameters");
             }
 
             this.ServerURLString = SERVERURLSTRING + ServerURLTail;
         }
-        FetchTaskInput(String paylahID,FetchMode fetchMode) throws Exception {
-            this.paylahID = paylahID;
-            this.fetchMode = fetchMode;
-            String ServerURLTail;
-            switch(fetchMode){
-                case MENU:
-                    ServerURLTail = String.format(Locale.US,"/admin/newmenu?keycode=12345");
-                    break;
-                default:
-                    throw new Exception("Invalid FetchTaskInput parameters");
-            }
-            this.ServerURLString = SERVERURLSTRING + ServerURLTail;
-        }
+
     }
 
 
     /**
      * AsyncTask to fetch a restautant's JSON code from database
+     * Returns null on error, else a FetchedObject
      */
     static class FetchTask extends AsyncTask<FetchTaskInput, Void, FetchedObject> {
         public AsyncFetchResponse delegate=null;

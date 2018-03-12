@@ -6,32 +6,15 @@
     android:orientation="vertical"
     tools:context="com.example.frederic.genericapp.RestaurantMainActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+    <TextView
+        android:id="@+id/header_title"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
 
-        <ImageView
-            android:id="@+id/restaurant_main_activity_back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_toStartOf="@+id/restaurant_main_activity_name"
-            android:onClick="onRestaurantMainBackClick"
-            android:scaleType="fitXY"
-            android:src="@drawable/activity_restautant_main__icon_back"
-            android:padding="20dp" />
-
-        <TextView
-            android:id="@+id/restaurant_main_activity_name"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_centerHorizontal="true"
-
-            android:text="Default name"
-            android:textColor="#000000"
-            android:textSize="25sp" />
-
-    </RelativeLayout>
+        android:text="Default name"
+        android:textColor="#000000"
+        android:textSize="25sp"/>
     <ImageView
         android:id="@+id/restaurant_main_activity_image"
         android:layout_width="match_parent"

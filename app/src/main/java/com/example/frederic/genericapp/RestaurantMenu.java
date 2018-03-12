@@ -39,7 +39,7 @@ class RestaurantMenu extends FetchedObject {
      * @param description   Description of item
      * @param imageURL      Image of item
      */
-    void addItem(int id, double price, String name,String description,String imageURL){
+    void addItem(int id, String price, String name,String description,String imageURL){
         try {
             URL url = new URL(imageURL);
             MenuItem item = new MenuItem(id,price,name,description,url);
@@ -57,7 +57,7 @@ class RestaurantMenu extends FetchedObject {
         System.out.println(imageURL);
         for (int i =0;i<menu.size();i++){
             MenuItem item = menu.get(i);
-            String s = String.format(Locale.US,"id %d\nprice %.2f\nname %s\ndescription %s",item.id,item.price,item.name,item.description);
+            String s = String.format(Locale.US,"id %d\nprice %s\nname %s\ndescription %s",item.id,item.price,item.name,item.description);
             System.out.println(s);
         }
     }
@@ -65,11 +65,11 @@ class RestaurantMenu extends FetchedObject {
 }
 class MenuItem {
     int id;
-    double price;
+    String price;
     String name;
     String description;
     URL imageURL;
-    MenuItem(int id, double price, String name,String description,URL imageURL){
+    MenuItem(int id, String price, String name,String description,URL imageURL){
         this.id = id;
         this.price = price;
         this.name = name;
