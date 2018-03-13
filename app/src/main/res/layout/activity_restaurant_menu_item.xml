@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.frederic.genericapp.RestaurantMenuItemActivity"
+    >
+
+    <TextView
+        android:id="@+id/restaurant_menu_item_name"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal"
+        android:layout_weight="1"
+
+        android:text="Default Text"
+        android:textColor="#000000"
+        android:textSize="30sp"/>
+    <ImageView
+        android:id="@+id/restaurant_menu_item_image"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="7" />
+
+    <ScrollView
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="4">
+
+        <TextView
+            android:id="@+id/restaurant_menu_item_description_price"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="center_horizontal"
+
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
+            android:textColor="#000000"
+            android:textSize="20sp"/>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/restaurant_menu_item_minus"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+
+            android:src="@drawable/activity_restaurant_menu__item_minus"
+            android:paddingStart="10sp"
+            android:paddingRight="10sp"
+
+            android:onClick="onMinusButtonClick"
+            />
+        <TextView
+            android:id="@+id/restaurant_menu_item_quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+
+            android:text="0"
+            android:textColor="#000000"
+            android:textSize="40sp"
+
+            />
+        <ImageView
+            android:id="@+id/restaurant_menu_item_plus"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+
+            android:src="@drawable/activity_restaurant_menu__item_plus"
+            android:paddingStart="10sp"
+            android:paddingRight="10sp"
+
+            android:onClick="onPlusButtonClick"
+            />
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/restaurant_menu_item_add_button"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="end"
+
+                android:text="@string/add_item"
+                android:textColor="#000000"
+                android:textSize="40sp"
+
+                android:paddingLeft="20sp"
+                android:paddingRight="20sp"
+                android:layout_marginRight="10sp"
+
+                android:onClick="onAddItemClick"
+                />
+        </LinearLayout>
+    </LinearLayout>
+    <EditText
+        android:id="@+id/restaurant_menu_item_requests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+
+        android:hint="@string/special_request"
+        android:inputType="textMultiLine"
+        android:scrollbars="vertical"/>
+</LinearLayout>

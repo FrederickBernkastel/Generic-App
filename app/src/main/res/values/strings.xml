@@ -11,16 +11,21 @@
     <string name="label_menu">Menu</string>
     <string name="label_orders">My Orders</string>
     <string name="label_bill">My Bill</string>
+    <string name="special_request">Special Requests</string>
+    <string name="add_item">Add</string>
 
     <string name="credits">
         Chef icon made by Monkik from flaticon.com\n
         Menu icon made by Freepik from flaticon.com\n
         Orders icon made by Freepik from flaticon.com\n
         Bill icon made by Gregor Cresnar from flaticon.com\n
+        Minus icon made by Hadrien from flaticon.com\n
+        Plus icon made by Minh Hoang from flaticon.com\n
     </string>
 
     <!-- String Keys -->
     <string name="key_restaurant_menu">restaurant_menu</string>
+    <string name="key_menu_item">menu_item</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

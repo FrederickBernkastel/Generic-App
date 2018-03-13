@@ -91,8 +91,8 @@ public class RestaurantMainActivity extends AppCompatActivity{
             obj1 = new JSONObject();
             obj1.put("food_id",1003);
             obj1.put("price","$ 450.00");
-            obj1.put("name","Jumbo Whale Meat with Cavier Pizza");
-            obj1.put("description","When you can't decide between junk food and fine dining");
+            obj1.put("name","Duluxe Pizza Pie (Foie grass, truffles, cavier)");
+            obj1.put("description","Can't decide between junk food and fine dining? Look no further, for our Duluxe Pizza Pie is sure to satisfy your cravings. Topped with 24-karat gold flakes, Foie grass, truffles, cavier, and baked with the finest cheese fresh from a bull's udder, this meal is sure to help you leave your toilet shinier than before you used it.\n\n\nNote: Price per slice, not pizza");
             obj1.put("image_link","http://finedininglovers.cdn.crosscast-system.com/BlogPost/l_7853_expensive.pizza-2.jpg");
             array.put(obj1);
             json.put("menu",array);
