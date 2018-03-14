@@ -102,6 +102,31 @@ class DatabaseConnector {
 
     }
 
+    /**
+     * Parse string from server, and return it in a standard format independent of server side changes
+     * @param s         Json String to be parsed
+     * @return          TableNumResponse containing formatted information about response
+     */
+    static TableNumResponse parseJSONTableNumResponse(String s){
+        // Possible server responses to GET request
+        final String NUMPEOPLETRUE = "True";
+        final String NUMPEOPLEFALSE = "False";
+        final String INVALIDTABLENUMTRUE = "NIL";
+
+        // Interpret server response and modify relevant parameters
+        TableNumResponse response = new TableNumResponse();
+        if(s.equals(INVALIDTABLENUMTRUE)){
+            response.isInvalidTableNum = true;
+        } else if(s.equals(NUMPEOPLETRUE)) {
+            response.isInvalidTableNum = false;
+            response.isPeopleNumRequired = true;
+        } else if (s.equals(NUMPEOPLEFALSE)){
+            response.isInvalidTableNum = false;
+            response.isPeopleNumRequired = false;
+        }
+        return response;
+    }
+
 
     /**
      * Input information for fetching data from database using AsyncTask
@@ -116,13 +141,13 @@ class DatabaseConnector {
             String ServerURLTail;
             switch(fetchMode){
                 case TABLENO:
-                    ServerURLTail = String.format(Locale.US,"/tableno?number=%d?plid=%s",number,paylahID);
+                    ServerURLTail = String.format(Locale.US,"/tableno?tablenum=%d&plid=%s",number,paylahID);
                     break;
                 case PEOPLENO:
-                    ServerURLTail = String.format(Locale.US,"/numpeople?number=%d?plid=%s",number,paylahID);
+                    ServerURLTail = String.format(Locale.US,"/numpeople?tablenum=%d&plid=%s",number,paylahID);
                     break;
                 case MENU:
-                    ServerURLTail = String.format(Locale.US,"/menu?tableno=%d",number);
+                    ServerURLTail = String.format(Locale.US,"/menu?tablenum=%d",number);
                 default:
                     throw new Exception("Invalid FetchTaskInput parameters");
             }
@@ -175,7 +200,7 @@ class DatabaseConnector {
                             fetchedObject = parseJSONMenu(response);
                             break;
                         case TABLENO:
-                            fetchedObject.response = response;
+                            fetchedObject = parseJSONTableNumResponse(response);
                             break;
                         case PEOPLENO:
                             break;

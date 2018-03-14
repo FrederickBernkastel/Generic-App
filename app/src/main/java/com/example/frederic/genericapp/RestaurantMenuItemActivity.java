@@ -120,8 +120,8 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
         int itemQuantity = Integer.valueOf(String.valueOf(itemQuantityTextview.getText()));
         // Check if valid itemQuantity
         if (itemQuantity>0) {
-            // TODO: Generate unique order number
-            // TODO: Send Order to database in appropriate format
+            // Save Order Locally
+
 
             onBackPressed();
         }
