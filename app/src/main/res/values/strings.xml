@@ -14,6 +14,9 @@
     <string name="special_request">Special requests to chef</string>
     <string name="add_item">Add</string>
     <string name="add_special_request_header">Item %s</string>
+    <string name="price_total">TOTAL</string>
+    <string name="order_now">ORDER NOW</string>
+    <string name="pending_orders">Pending Orders</string>
 
     <string name="credits">
         Chef icon made by Monkik from flaticon.com\n
@@ -29,7 +32,6 @@
     <string name="key_menu_item">menu_item</string>
     <string name="key_batch_orders">food_orders</string>>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
 </resources>

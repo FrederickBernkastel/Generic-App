@@ -35,7 +35,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".RestaurantMenuActivity" />
-        <activity android:name=".RestaurantMenuItemActivity"></activity>
+        <activity android:name=".RestaurantMenuItemActivity" />
+        <activity android:name=".MyOrdersActivity"></activity>
     </application>
 
 </manifest>

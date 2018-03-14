@@ -52,7 +52,7 @@ class DatabaseConnector {
                     {
                         "food_id": 999,
                         "price": 5.20,
-                        "currency":"S$_"
+                        "currency":"S$*"
                         "name":"Fries",
                         "description":"I am French",
                         "image_link":"www.link.com",
@@ -94,9 +94,9 @@ class DatabaseConnector {
                 String name = item.getString("name");
                 String description = item.getString("description");
                 String currency = item.getString("currency");
-                if (currency.charAt(0)=='_' && currency.length()>1){
+                if (currency.charAt(0)=='*' && currency.length()>1){
                     price = price + " " + currency.substring(1);
-                } else if (currency.charAt(currency.length()-1)=='_' && currency.length()>1){
+                } else if (currency.charAt(currency.length()-1)=='*' && currency.length()>1){
                     price = currency.substring(0,currency.length()-1) + " " + price;
                 } else {
                     price = "S$ " + price;

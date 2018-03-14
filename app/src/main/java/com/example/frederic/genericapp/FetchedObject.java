@@ -60,6 +60,19 @@ class RestaurantMenu extends FetchedObject {
     }
 
     /**
+     * Function to find MenuItem in O(n), returns null if not found
+     * @param id        Unique id of item to fetch
+     * @return          MenuItem object
+     */
+    MenuItem findItem(int id){
+        for (MenuItem item:menu){
+            if (item.id==id){
+                return item;
+            }
+        }
+        return null;
+    }
+    /**
      *  Function to help debugging process by printing menu items
      */
     void printMenu(){

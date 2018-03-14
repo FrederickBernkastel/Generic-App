@@ -62,35 +62,40 @@ public class RestaurantMainActivity extends AppCompatActivity{
             json.put("imagehyperlink","http://a57.foxnews.com/media2.foxnews.com/2016/06/09/640/360/060916_chew_crispychicken_1280.jpg");
             JSONObject obj1 = new JSONObject();
             obj1.put("food_id",999);
-            obj1.put("price","$ 5.00");
+            obj1.put("price","5.00");
+            obj1.put("currency","S$*");
             obj1.put("name","Baagaa");
             obj1.put("description","Meat so fresh, you can still hear it baa-ing");
             obj1.put("image_link","https://lh3.googleusercontent.com/alX3SlsbUt4ZBZ1ct6efz5wxIcjM6S3Gva_pstMNXGjlFAQRr6CbpwFyFNoixBgPOGXxQi7vqC3U0CDT8oGz4lu4IZWzifs40owj_jA=w600-l68");
             array.put(obj1);
             obj1 = new JSONObject();
             obj1.put("food_id",1000);
-            obj1.put("price","$ 1.99");
+            obj1.put("price","1.99");
+            obj1.put("currency","S$*");
             obj1.put("name","Fries");
             obj1.put("description","The straightest thing you'll put in your mouth every year");
             obj1.put("image_link","https://chiosrotisserie.com/wp-content/uploads/2017/07/fries.jpg");
             array.put(obj1);
             obj1 = new JSONObject();
             obj1.put("food_id",1001);
-            obj1.put("price","$ 1.49");
+            obj1.put("price","1.49");
+            obj1.put("currency","S$*");
             obj1.put("name","Coca-cola");
             obj1.put("description","Is pepsi OK?");
             obj1.put("image_link","https://i5.walmartimages.com/asr/791c580c-9a80-4d53-b972-50c78a935d72_1.8a4d4ced51a177d1c4dbbfb823d696f5.jpeg");
             array.put(obj1);
             obj1 = new JSONObject();
             obj1.put("food_id",1002);
-            obj1.put("price","$ 0.99");
+            obj1.put("price","0.99");
+            obj1.put("currency","S$*");
             obj1.put("name","Chocolate Soft-serve Ice-cream");
             obj1.put("description","‎💩");
             obj1.put("image_link","http://dlitesshoppe.com/wp-content/uploads/2015/03/Dlites_chocolate.png");
             array.put(obj1);
             obj1 = new JSONObject();
             obj1.put("food_id",1003);
-            obj1.put("price","$ 450.00");
+            obj1.put("price","450.00");
+            obj1.put("currency","S$*");
             obj1.put("name","Duluxe Pizza Pie (Foie grass, truffles, cavier)");
             obj1.put("description","Can't decide between junk food and fine dining? Look no further, for our Duluxe Pizza Pie is sure to satisfy your cravings. Topped with 24-karat gold flakes, Foie grass, truffles, cavier, and baked with the finest cheese fresh from a bull's udder, this meal is sure to help you leave your toilet shinier than before you used it.\n\n\nNote: Price per slice, not pizza");
             obj1.put("image_link","http://finedininglovers.cdn.crosscast-system.com/BlogPost/l_7853_expensive.pizza-2.jpg");
@@ -117,6 +122,7 @@ public class RestaurantMainActivity extends AppCompatActivity{
             );
         } catch (Exception e){
             System.out.println("FAIL");
+            System.out.println(e.getMessage());
         }
 
     }
@@ -135,7 +141,8 @@ public class RestaurantMainActivity extends AppCompatActivity{
     }
     // TODO: Implement
     public void onRestaurantMainOrdersClick(View v){
-
+        Intent intent = new Intent(RestaurantMainActivity.this,MyOrdersActivity.class);
+        startActivity(intent);
     }
     // TODO: Implement
     public void onRestaurantMainBillClick(View v){

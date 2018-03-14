@@ -14,7 +14,7 @@ public class PostObject {
  * Data class to hold data on pending orders
  */
 class FoodBatchOrder extends PostObject{
-    private ArrayList<FoodOrder> foodOrders;
+    ArrayList<FoodOrder> foodOrders;
     FoodBatchOrder(){
         foodOrders = new ArrayList<>();
     }
@@ -23,6 +23,21 @@ class FoodBatchOrder extends PostObject{
     }
     void insertFoodOrder(int foodId){
         foodOrders.add(new FoodOrder(foodId));
+    }
+
+    /**
+     * Returns quantity of an item purchased
+     * @param           foodId
+     * @return          count
+     */
+    int getItemCount(int foodId){
+        int count = 0;
+        for(FoodOrder foodOrder:foodOrders){
+            if (foodOrder.foodId==foodId){
+                count++;
+            }
+        }
+        return count;
     }
 }
 

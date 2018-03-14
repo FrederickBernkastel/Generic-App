@@ -60,14 +60,14 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
         ImageView itemImage = findViewById(R.id.restaurant_menu_item_image);
         ImageView plusButton = findViewById(R.id.restaurant_menu_item_plus);
         ImageView minusButton = findViewById(R.id.restaurant_menu_item_minus);
-        Button addButton = findViewById(R.id.restaurant_menu_item_add_button);
 
         // Set relevant text
         itemName.setText(menuItem.name);
         itemDescription.setText(menuItem.description);
 
         // Set / Resize images
-        ImageResize.loadImageByUrl(RestaurantMenuItemActivity.this,menuItem.imageURL.toString(),itemImage,width,height/8*3);
+        int itemImageSize = (width<height/8*3)?width:height/8*3;
+        ImageResize.loadImageByUrl(RestaurantMenuItemActivity.this,menuItem.imageURL.toString(),itemImage,itemImageSize,itemImageSize);
         plusButton.setImageBitmap(ImageResize.decodeSampledBitmapFromResource(
                 getResources(),
                 R.drawable.activity_restaurant_menu__item_plus,
@@ -141,12 +141,13 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
     private String getItemPrice(MenuItem menuItem,int itemQuantity){
         // Update price
         double itemPrice;
-        String currency = "$";
+        String currency;
         try {
             itemPrice = Double.parseDouble(menuItem.price.split(" ")[1]);
             currency = menuItem.price.split(" ")[0];
-        } catch (IndexOutOfBoundsException e){
+        } catch (NumberFormatException e){
             itemPrice = Double.parseDouble(menuItem.price.split(" ")[0]);
+            currency = menuItem.price.split(" ")[1];
         }
         itemPrice *= itemQuantity;
         return String.format(Locale.US,"%s%.2f",currency,itemPrice);
