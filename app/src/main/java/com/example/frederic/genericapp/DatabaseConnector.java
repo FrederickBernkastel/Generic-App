@@ -123,6 +123,8 @@ class DatabaseConnector {
         final String INVALIDTABLENUMTRUE = "NIL";
 
         // Interpret server response and modify relevant parameters
+        System.out.println(s);
+        System.out.println("temp");
         TableNumResponse response = new TableNumResponse();
         if(s.equals(INVALIDTABLENUMTRUE)){
             response.isInvalidTableNum = true;
@@ -133,6 +135,7 @@ class DatabaseConnector {
             response.isInvalidTableNum = false;
             response.isPeopleNumRequired = false;
         }
+        System.out.println(String.valueOf(response.isPeopleNumRequired));
         return response;
     }
 
@@ -209,11 +212,14 @@ class DatabaseConnector {
                     StringBuilder stringBuilder = new StringBuilder();
                     String response;
 
+
                     BufferedReader bufferedReader = new BufferedReader(responseBodyReader);
                     while ((response = bufferedReader.readLine()) != null) {
                         stringBuilder.append(response);
                     }
                     response = stringBuilder.toString();
+
+                    System.out.println("The server responded with "+ response);
 
                     // Handle different GET requests
                     switch(fetchTaskInput.fetchMode){
@@ -231,11 +237,12 @@ class DatabaseConnector {
 
                 } else {
                     // Connection failed
-                    throw new IOException();
+                    throw new IOException("Response code error" + String.valueOf(myConnection.getResponseCode()));
                 }
 
             } catch (IOException e){
                 Log.e("Server Error","Error connecting to server in DatabaseConnector");
+                Log.e("Server Error",e.getMessage());
                 return null;
             }
             return fetchedObject;

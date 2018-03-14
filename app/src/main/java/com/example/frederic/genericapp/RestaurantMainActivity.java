@@ -55,8 +55,8 @@ public class RestaurantMainActivity extends AppCompatActivity{
 
         //Test
         try {
-            // INSERT RESTAURANT MENU FOR DEBUGGING, DELETE WHEN DONE
-            JSONArray array = new JSONArray();
+            // TODO: INSERT RESTAURANT MENU FOR DEBUGGING, DELETE WHEN DONE
+            /*JSONArray array = new JSONArray();
             JSONObject json=new JSONObject();
             json.put("name","Ugandan Cuisine");
             json.put("imagehyperlink","http://a57.foxnews.com/media2.foxnews.com/2016/06/09/640/360/060916_chew_crispychicken_1280.jpg");
@@ -103,7 +103,7 @@ public class RestaurantMainActivity extends AppCompatActivity{
             json.put("menu",array);
             String s = json.toString();
             RestaurantMenu savedMenu = DatabaseConnector.parseJSONMenu(s);
-            new SharedPrefManager<RestaurantMenu>().saveObj(getString(R.string.key_restaurant_menu),savedMenu,RestaurantMainActivity.this);
+            new SharedPrefManager<RestaurantMenu>().saveObj(getString(R.string.key_restaurant_menu),savedMenu,RestaurantMainActivity.this);*/
             // END OF DELETE PORTION
 
             // Fetch restaurant menu from sharedPreferences
