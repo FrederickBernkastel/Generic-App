@@ -144,19 +144,31 @@ class DatabaseConnector {
         String paylahID;
         String ServerURLString;
         FetchMode  fetchMode;
-        FetchTaskInput(String paylahID,int number,FetchMode fetchMode) throws Exception{
+        FetchTaskInput(String paylahID,int tableNumber,FetchMode fetchMode) throws Exception{
             this.paylahID = paylahID;
             this.fetchMode = fetchMode;
             String ServerURLTail;
             switch(fetchMode){
                 case TABLENO:
-                    ServerURLTail = String.format(Locale.US,"/tableno?tablenum=%d&plid=%s",number,paylahID);
-                    break;
-                case PEOPLENO:
-                    ServerURLTail = String.format(Locale.US,"/numpeople?tablenum=%d&plid=%s",number,paylahID);
+                    ServerURLTail = String.format(Locale.US,"/register?table_number=%d&plid=%s",tableNumber,paylahID);
                     break;
                 case MENU:
-                    ServerURLTail = String.format(Locale.US,"/menu?tablenum=%d",number);
+                    ServerURLTail = String.format(Locale.US,"/menu?table_number=%d",tableNumber);
+                    break;
+                default:
+                    throw new Exception("Invalid FetchTaskInput parameters");
+            }
+
+            this.ServerURLString = SERVERURLSTRING + ServerURLTail;
+        }
+        FetchTaskInput(String paylahID,int tableNumber,int peopleNumber, FetchMode fetchMode) throws Exception{
+            this.paylahID = paylahID;
+            this.fetchMode = fetchMode;
+            String ServerURLTail;
+            switch(fetchMode){
+                case PEOPLENO:
+                    ServerURLTail = String.format(Locale.US,"/register?table_number=%d&plid=%s&numpeople=%d",tableNumber,paylahID,peopleNumber);
+                    break;
                 default:
                     throw new Exception("Invalid FetchTaskInput parameters");
             }

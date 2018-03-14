@@ -12,7 +12,7 @@ import android.os.Bundle;
  * Class with tabs to display pending / sent orders
  * Created by: Frederick Bernkastel
  */
-public class MyOrdersActivity extends AppCompatActivity {
+public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener{
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
 
@@ -31,6 +31,21 @@ public class MyOrdersActivity extends AppCompatActivity {
 
         //Creating our pager adapter
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), mTabLayout.getTabCount());
+
+    }
+
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        mViewPager.setCurrentItem(tab.getPosition());
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
+
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
 
     }
 }
