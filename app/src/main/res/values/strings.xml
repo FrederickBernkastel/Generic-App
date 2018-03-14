@@ -11,8 +11,9 @@
     <string name="label_menu">Menu</string>
     <string name="label_orders">My Orders</string>
     <string name="label_bill">My Bill</string>
-    <string name="special_request">Special Requests</string>
+    <string name="special_request">Special requests to chef</string>
     <string name="add_item">Add</string>
+    <string name="add_special_request_header">Item %s</string>
 
     <string name="credits">
         Chef icon made by Monkik from flaticon.com\n
@@ -26,6 +27,7 @@
     <!-- String Keys -->
     <string name="key_restaurant_menu">restaurant_menu</string>
     <string name="key_menu_item">menu_item</string>
+    <string name="key_batch_orders">food_orders</string>>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

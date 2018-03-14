@@ -24,7 +24,8 @@ import java.util.HashMap;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment of RestaurantMenuActivity to hold menu categories / items
+ * Created by: Frederick Bernkastel
  */
 public class RestaurantMenuFragment extends Fragment {
     private int height;
