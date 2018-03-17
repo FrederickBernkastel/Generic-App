@@ -1,7 +1,7 @@
 /*
     Class to connect to database
 */
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Data;
 
 
 import android.os.AsyncTask;
@@ -12,11 +12,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Locale;
 
 
@@ -24,7 +26,7 @@ import java.util.Locale;
  * Class to handle connections to the database PostgreSQL, should be used in a thread
  * Created by: Frederick Bernkastel
  */
-class DatabaseConnector {
+public class DatabaseConnector {
 
     private static final String SERVERURLSTRING = "http://10.12.184.102:4995/api";
     private static final String CHARSET = "UTF-8";
@@ -32,8 +34,10 @@ class DatabaseConnector {
     public enum FetchMode{
         MENU,
         TABLENO,
-        PEOPLENO
+        PEOPLENO,
+        EXISTINGORDERS
     }
+
 
 
     /**
@@ -41,7 +45,7 @@ class DatabaseConnector {
      * @param s     Json String to be parsed
      * @return      RestaurantMenu containing information in JSON string
      */
-    static RestaurantMenu parseJSONMenu(String s){
+    public static RestaurantMenu parseJSONMenu(String s){
         /*
             The below JSON format is updated to v1.0
             JSON FORMAT FOR INPUT REQUESTS
@@ -63,22 +67,7 @@ class DatabaseConnector {
                     }
                 ]
              }
-             JSON FORMAT FOR OUTPUT ORDERS
-             {
-                "tableno":111,
-                "orders": [
-                    {
-                        "food_id":999,
-                        "quantity":1,
-                        "specialrequest":""
-                    } ,
-                    {
-                        "food_id":1000,
-                        "quantity":0,
-                        "specialrequest:"No fish"
-                    }
-                ]
-             }
+
         */
         try {
 
@@ -116,15 +105,13 @@ class DatabaseConnector {
      * @param s         Json String to be parsed
      * @return          TableNumResponse containing formatted information about response
      */
-    static TableNumResponse parseJSONTableNumResponse(String s){
+    public static TableNumResponse parseJSONTableNumResponse(String s){
         // Possible server responses to GET request
         final String NUMPEOPLETRUE = "True";
         final String NUMPEOPLEFALSE = "False";
         final String INVALIDTABLENUMTRUE = "NIL";
 
         // Interpret server response and modify relevant parameters
-        System.out.println(s);
-        System.out.println("temp");
         TableNumResponse response = new TableNumResponse();
         if(s.equals(INVALIDTABLENUMTRUE)){
             response.isInvalidTableNum = true;
@@ -139,15 +126,52 @@ class DatabaseConnector {
         return response;
     }
 
+    /**
+     * Parse JSON file representing statuses of ordered items, and output FoodStatuses class
+     * @param       s
+     * @return      foodStatuses
+     */
+    public static FoodStatuses parseFoodStatusResponse(String s){
+        /*  JSON FORMAT FOR INPUT FOOD STATUSES
+            {
+                "orders": [ {
+                    "table_number": 3,
+                    "start_time": "2018-03-14 01:56:48.426864",
+                    "food_id":103,
+                    "delivered":false
+                    "comments":"comment"
+                 }, {
+                    ...
+                 }]
+            }
+
+         */
+        FoodStatuses foodStatuses = new FoodStatuses();
+        try {
+
+            JSONObject restaurantJSON = new JSONObject(s);
+            JSONArray jsonStatuses = restaurantJSON.getJSONArray("orders");
+            for (int i=0; i<jsonStatuses.length(); i++){
+                JSONObject item = jsonStatuses.getJSONObject(i);
+                int id = item.getInt("food_id");
+                boolean delivered = item.getBoolean("delivered");
+                foodStatuses.addStatus(id,delivered);
+            }
+            return foodStatuses;
+        } catch (JSONException e){
+            throw new RuntimeException(e);
+        }
+    }
+
 
     /**
      * Input information for fetching data from database using AsyncTask
      */
-    static class FetchTaskInput{
+    public static class FetchTaskInput{
         String paylahID;
         String ServerURLString;
         FetchMode  fetchMode;
-        FetchTaskInput(String paylahID,int tableNumber,FetchMode fetchMode) throws Exception{
+        public FetchTaskInput(String paylahID,int tableNumber,FetchMode fetchMode) throws Exception{
             this.paylahID = paylahID;
             this.fetchMode = fetchMode;
             String ServerURLTail;
@@ -164,7 +188,7 @@ class DatabaseConnector {
 
             this.ServerURLString = SERVERURLSTRING + ServerURLTail;
         }
-        FetchTaskInput(String paylahID,int tableNumber,int peopleNumber, FetchMode fetchMode) throws Exception{
+        public FetchTaskInput(String paylahID,int tableNumber,int peopleNumber, FetchMode fetchMode) throws Exception{
             this.paylahID = paylahID;
             this.fetchMode = fetchMode;
             String ServerURLTail;
@@ -178,6 +202,19 @@ class DatabaseConnector {
 
             this.ServerURLString = SERVERURLSTRING + ServerURLTail;
         }
+        public FetchTaskInput(String paylahID, FetchMode fetchMode) throws Exception {
+            this.paylahID = paylahID;
+            this.fetchMode = fetchMode;
+            String ServerURLTail;
+            switch (fetchMode){
+                case EXISTINGORDERS:
+                    ServerURLTail = String.format(Locale.US,"/existing_orders?plid=%s",paylahID);
+                    break;
+                default:
+                    throw new Exception("Invalid FetchTaskInput parameters");
+            }
+            this.ServerURLString = SERVERURLSTRING + ServerURLTail;
+        }
 
     }
 
@@ -186,9 +223,9 @@ class DatabaseConnector {
      * AsyncTask to fetch a restautant's JSON code from database
      * Returns null on error, else a FetchedObject
      */
-    static class FetchTask extends AsyncTask<FetchTaskInput, Void, FetchedObject> {
+    public static class FetchTask extends AsyncTask<FetchTaskInput, Void, FetchedObject> {
         public AsyncFetchResponse delegate=null;
-        FetchTask(AsyncFetchResponse delegate){
+        public FetchTask(AsyncFetchResponse delegate){
             this.delegate = delegate;
         }
         @Override
@@ -204,7 +241,9 @@ class DatabaseConnector {
                 HttpURLConnection myConnection = (HttpURLConnection) serverURL.openConnection();
 
                 // Set request Headers
+                myConnection.setRequestMethod("GET");
                 myConnection.setRequestProperty("User-Agent", paylahID);
+
 
                 if (myConnection.getResponseCode() == 200) {
                     // Connection success, read string
@@ -219,8 +258,6 @@ class DatabaseConnector {
                     }
                     response = stringBuilder.toString();
 
-                    System.out.println("The server responded with "+ response);
-
                     // Handle different GET requests
                     switch(fetchTaskInput.fetchMode){
                         case MENU:
@@ -230,6 +267,9 @@ class DatabaseConnector {
                             fetchedObject = parseJSONTableNumResponse(response);
                             break;
                         case PEOPLENO:
+                            break;
+                        case EXISTINGORDERS:
+                            fetchedObject = parseFoodStatusResponse(response);
                             break;
 
                     }
@@ -257,19 +297,71 @@ class DatabaseConnector {
         }
     }
 
-
+    /**
+     * Constructs JSON string representing food order, to be sent to the server
+     * @param       batchOrder
+     * @return      JSON String representing FoodBatchOrder
+     */
+    private static String constructJSON(FoodBatchOrder batchOrder){
+        int counter = 0;
+        int totalOrders = batchOrder.foodOrders.size();
+        StringBuilder sBuilder = new StringBuilder("{\"orders\":[");
+        for(FoodOrder order:batchOrder.foodOrders){
+            String s = String.format(Locale.US,"{%d,\"%s\"}");
+            sBuilder.append(s);
+            if(++counter < totalOrders){
+                sBuilder.append(',');
+            }
+        }
+        sBuilder.append("]}");
+        return sBuilder.toString();
+    }
 
     /**
      * Output information for posting data using AsyncTask
      */
     static class PostTaskOutput{
         String ServerURLString;
-        String JSONData;
+        byte[] JSONData;
         String paylahID;
-        PostTaskOutput(String paylahID,String ServerURLTail,String JSONData){
+
+        PostTaskOutput(String paylahID, FoodBatchOrder batchOrder) throws UnsupportedEncodingException{
             this.paylahID = paylahID;
+            String ServerURLTail =String.format(Locale.US,"/make_order?plid=%d",paylahID);
             this.ServerURLString = SERVERURLSTRING + ServerURLTail;
-            this.JSONData = JSONData;
+            this.JSONData = constructJSON(batchOrder).getBytes(CHARSET);
+
+        }
+    }
+    public static class PostTask extends AsyncTask<PostTaskOutput,Void,Void>{
+        @Override
+        protected Void doInBackground(PostTaskOutput... params) {
+            PostTaskOutput postTaskOutput = params[0];
+            String paylahID = postTaskOutput.paylahID;
+
+            try {
+                // Create URL
+                URL serverURL = new URL(postTaskOutput.ServerURLString);
+
+                // Create connection
+                HttpURLConnection myConnection = (HttpURLConnection) serverURL.openConnection();
+
+                // Set request Headers
+                myConnection.setRequestMethod("POST");
+                myConnection.setRequestProperty("User-Agent", paylahID);
+                myConnection.setRequestProperty( "charset", "utf-8");
+
+                // Write to server
+                DataOutputStream wr = new DataOutputStream( myConnection.getOutputStream());
+                wr.write(postTaskOutput.JSONData);
+
+
+            } catch (IOException e){
+                Log.e("Server Error","Error connecting to server in DatabaseConnector");
+                Log.e("Server Error",e.getMessage());
+                return null;
+            }
+            return null;
         }
     }
 }

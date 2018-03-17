@@ -17,6 +17,7 @@
     <string name="price_total">TOTAL</string>
     <string name="order_now">ORDER NOW</string>
     <string name="pending_orders">Pending Orders</string>
+    <string name="toast_order_sent_success">Order sent to kitchen</string>
 
     <string name="credits">
         Chef icon made by Monkik from flaticon.com\n
@@ -30,8 +31,10 @@
     <!-- String Keys -->
     <string name="key_restaurant_menu">restaurant_menu</string>
     <string name="key_menu_item">menu_item</string>
-    <string name="key_batch_orders">food_orders</string>>
+    <string name="key_batch_orders">food_orders</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>>
 
 
 </resources>

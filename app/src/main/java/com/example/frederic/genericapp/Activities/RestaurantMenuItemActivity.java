@@ -1,21 +1,16 @@
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Activities;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -24,7 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import org.w3c.dom.Text;
+import com.example.frederic.genericapp.Data.FoodBatchOrder;
+import com.example.frederic.genericapp.Data.FoodOrder;
+import com.example.frederic.genericapp.Data.MenuItem;
+import com.example.frederic.genericapp.ImageResize;
+import com.example.frederic.genericapp.R;
+import com.example.frederic.genericapp.SharedPrefManager;
 
 import java.util.Locale;
 
@@ -37,6 +37,14 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
     int numOfSpecialRequestVisible = 0;
     int height,width;
     final int VIEWSPERSPECIALREQUESTROW = 4;
+
+    TextView itemName;
+    TextView itemDescription;
+    TextView itemQuantityTextview;
+    TextView priceTextView;
+    ImageView itemImage;
+    ImageView plusButton;
+    ImageView minusButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +63,13 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
         int button_size = (height/8<width/5)?height/8:width/5;
 
         // Get references to widgets
-        TextView itemName = findViewById(R.id.restaurant_menu_item_name);
-        TextView itemDescription = findViewById(R.id.restaurant_menu_item_description);
-        ImageView itemImage = findViewById(R.id.restaurant_menu_item_image);
-        ImageView plusButton = findViewById(R.id.restaurant_menu_item_plus);
-        ImageView minusButton = findViewById(R.id.restaurant_menu_item_minus);
+        itemName = findViewById(R.id.restaurant_menu_item_name);
+        itemDescription = findViewById(R.id.restaurant_menu_item_description);
+        itemImage = findViewById(R.id.restaurant_menu_item_image);
+        plusButton = findViewById(R.id.restaurant_menu_item_plus);
+        minusButton = findViewById(R.id.restaurant_menu_item_minus);
+        itemQuantityTextview = findViewById(R.id.restaurant_menu_item_quantity);
+        priceTextView = findViewById(R.id.restaurant_menu_item_price);
 
         // Set relevant text
         itemName.setText(menuItem.name);
@@ -85,16 +95,17 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
         // This will disable the Soft Keyboard from appearing by default
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
+        // Display previous order for menu item, if present
+        display_previous_order(menuItem.id);
     }
 
 
     void onMinusButtonClick(View v){
         // Reduce item quantity if > 0
-        TextView itemQuantityTextview = findViewById(R.id.restaurant_menu_item_quantity);
         int itemQuantity = Integer.valueOf(String.valueOf(itemQuantityTextview.getText()));
         if (itemQuantity>0){
             itemQuantityTextview.setText(String.valueOf(itemQuantity-1));
-            TextView priceTextView = findViewById(R.id.restaurant_menu_item_price);
+
             // Show description instead of price if needed
             if(itemQuantity==1){
                 TextView descriptionTextView = findViewById(R.id.restaurant_menu_item_description);
@@ -115,12 +126,11 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
     }
     void onPlusButtonClick(View v){
         // Increase item quantity if < 10
-        TextView itemQuantityTextview = findViewById(R.id.restaurant_menu_item_quantity);
         int itemQuantity = Integer.valueOf(String.valueOf(itemQuantityTextview.getText()));
         if (itemQuantity<9){
             itemQuantityTextview.setText(String.valueOf(itemQuantity + 1));
             String price = getItemPrice(menuItem,itemQuantity + 1);
-            TextView priceTextView = findViewById(R.id.restaurant_menu_item_price);
+
             priceTextView.setText(price);
             // Hide description if quantity is not 0
             if (itemQuantity==0) {
@@ -154,16 +164,20 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
     }
 
     void onAddItemClick(View v){
-        TextView itemQuantityTextview = findViewById(R.id.restaurant_menu_item_quantity);
         int itemQuantity = Integer.valueOf(String.valueOf(itemQuantityTextview.getText()));
+        // Load batch oder
+        SharedPrefManager<FoodBatchOrder> prefManager = new SharedPrefManager<>();
+        FoodBatchOrder batchOrder = prefManager.fetchObj(getString(R.string.key_batch_orders),RestaurantMenuItemActivity.this,FoodBatchOrder.class);
+        if (batchOrder==null){
+            batchOrder=new FoodBatchOrder();
+        }
+
+        // Delete previous entry (if any)
+        batchOrder.deleteAll(menuItem.id);
+
         // Check if valid itemQuantity
         if (itemQuantity>0) {
-            // Save Order Locally
-            SharedPrefManager<FoodBatchOrder> prefManager = new SharedPrefManager<>();
-            FoodBatchOrder batchOrder = prefManager.fetchObj(getString(R.string.key_batch_orders),RestaurantMenuItemActivity.this,FoodBatchOrder.class);
-            if (batchOrder==null){
-                batchOrder=new FoodBatchOrder();
-            }
+            // Save batch order locally
             int food_id = menuItem.id;
             for(int item_idx=0;item_idx<itemQuantity;item_idx++){
                 if (item_idx<numOfSpecialRequestVisible){
@@ -178,16 +192,61 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
                     batchOrder.insertFoodOrder(food_id);
                 }
             }
+            // Save batchOrder
+            prefManager.saveObj(getString(R.string.key_batch_orders),batchOrder,RestaurantMenuItemActivity.this);
 
             // Inform user that order has been added
             String updateUser = String.format(Locale.US,"%d %s has been added to pending orders",itemQuantity,menuItem.name);
             Toast.makeText(RestaurantMenuItemActivity.this,updateUser,Toast.LENGTH_LONG).show();
+        } else {
+            // Save batchOrder
+            prefManager.saveObj(getString(R.string.key_batch_orders),batchOrder,RestaurantMenuItemActivity.this);
 
-            // Go back to menu
-            onBackPressed();
+            // Inform user that no item ordered
+            String updateUser = String.format(Locale.US,"%s has been removed from pending orders",menuItem.name);
+            Toast.makeText(RestaurantMenuItemActivity.this,updateUser,Toast.LENGTH_LONG).show();
         }
+
+        // Go back to menu
+        onBackPressed();
     }
 
+    private void display_previous_order(int foodID){
+        // Load pending orders
+        FoodBatchOrder batchOrder = new SharedPrefManager<FoodBatchOrder>().fetchObj(
+                getString(R.string.key_batch_orders),
+                RestaurantMenuItemActivity.this,
+                FoodBatchOrder.class
+        );
+
+        // Check if any orders
+        if (batchOrder==null){
+            return;
+        }
+
+        // Set previous order
+        int foodCount = 0;
+        EditText specialRequestEditText;
+        for (FoodOrder order : batchOrder.foodOrders){
+            if (order.foodId==foodID){
+                if(order.comment!=null){
+                    createNewSpecialRequestRow();
+                    specialRequestEditText = findViewById((numOfSpecialRequestVisible-1) *  VIEWSPERSPECIALREQUESTROW + 2);
+                    specialRequestEditText.setText(order.comment);
+                }
+                foodCount++;
+            }
+        }
+        itemQuantityTextview.setText(String.valueOf(foodCount));
+        priceTextView.setText(getItemPrice(menuItem,foodCount));
+
+        // Create extra special request row if neccessary
+        if(numOfSpecialRequestVisible<foodCount){
+            createNewSpecialRequestRow();
+        }
+
+
+    }
     private void deleteSpecialRequestRow(int deletedRowID){
         // Extract row id, if id belongs to view inside row
         deletedRowID = deletedRowID - deletedRowID%VIEWSPERSPECIALREQUESTROW;
@@ -336,10 +395,11 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
             int itemQuantity = Integer.valueOf(itemQuantityTextView.getText().toString());
 
             // Add editTextRow if needed
-            boolean isNewEntry = charSequence.equals("");
+            EditText lastEditText = findViewById((numOfSpecialRequestVisible-1)*VIEWSPERSPECIALREQUESTROW + 2);
+            boolean lastEntryFull = ! lastEditText.getText().toString().equals("") || (lastEditText==mEditText && mEditText.getText().toString().equals(""));
             boolean doesntExceedQuantity = numOfSpecialRequestVisible < itemQuantity;
 
-            if (isLastRow() && doesntExceedQuantity){
+            if (lastEntryFull && doesntExceedQuantity){
                 createNewSpecialRequestRow();
             }
         }
@@ -347,11 +407,11 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             // Delete editTextRow if needed
-            boolean isEmptyEntry = charSequence.equals("");
+            boolean isEmptyEntry = charSequence.toString().equals("");
+
             if(isEmptyEntry && !isLastRow()){
                 int rowId = mEditText.getId();
                 deleteSpecialRequestRow(rowId);
-                numOfSpecialRequestVisible -= 1;
             }
         }
 

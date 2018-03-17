@@ -1,19 +1,29 @@
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Fragments;
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.frederic.genericapp.Activities.RestaurantMenuItemActivity;
+import com.example.frederic.genericapp.Data.FoodBatchOrder;
+import com.example.frederic.genericapp.Data.FoodOrder;
+import com.example.frederic.genericapp.Data.MenuItem;
+import com.example.frederic.genericapp.Data.RestaurantMenu;
+import com.example.frederic.genericapp.R;
+import com.example.frederic.genericapp.SharedPrefManager;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -26,7 +36,12 @@ import java.util.Locale;
 public class MyPendingOrdersFragment extends Fragment {
     TableLayout table;
     TextView totalPriceTextView;
+    TextView priceLabelTextView;
     FoodBatchOrder pendingOrders;
+    Button orderButton;
+    int uniqueItemsOrdered = 0;
+    int width;
+
 
     public MyPendingOrdersFragment() {
         // Required empty public constructor
@@ -36,25 +51,55 @@ public class MyPendingOrdersFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Toast.makeText(getContext(),"IN",Toast.LENGTH_LONG).show();
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_my_pending_orders, container, false);
 
+        // Get screen size
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        width = displayMetrics.widthPixels;
+
         // Instantiate and reference relevant widgets
         totalPriceTextView = v.findViewById(R.id.pending_orders_fragment_price);
-        table = getActivity().findViewById(R.id.pending_orders_fragment_table);
+        priceLabelTextView = v.findViewById(R.id.pending_orders_fragment_price_label);
+        orderButton = v.findViewById(R.id.pending_orders_fragment_button);
+        table = v.findViewById(R.id.pending_orders_fragment_table);
+
+        // Attach onClick to button
+        orderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onOrderNowClick(view);
+            }
+        });
+
         return v;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
+        // Delete previously loaded items
+        deleteAllMenuItemTableEntry();
+
         // Load pending orders
         pendingOrders = new SharedPrefManager<FoodBatchOrder>().fetchObj(
                 getString(R.string.key_batch_orders),
                 getContext(),
                 FoodBatchOrder.class
         );
+        // Hide buttons/text if no orders
+        if (pendingOrders==null){
+            Toast.makeText(getContext(),"No pending orders",Toast.LENGTH_SHORT).show();
+            totalPriceTextView.setVisibility(View.GONE);
+            priceLabelTextView.setVisibility(View.GONE);
+            orderButton.setVisibility(View.GONE);
+
+            return;
+        }
+
         // Load menu
         RestaurantMenu menu = new SharedPrefManager<RestaurantMenu>().fetchObj(
                 getString(R.string.key_restaurant_menu),
@@ -81,6 +126,7 @@ public class MyPendingOrdersFragment extends Fragment {
                 currency = menuItem.price.split(" ")[1];
             }
             totalPrice+=itemPrice*pendingOrders.getItemCount(foodOrder.foodId);
+            displayedIDs.add(foodOrder.foodId);
         }
 
         // Set total price
@@ -121,21 +167,30 @@ public class MyPendingOrdersFragment extends Fragment {
         // Set View Ids
         layout.setId(menuItem.id);
 
-        // Set layout params
+        // Set layout params for item name/quantity
         RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
         quantityNameTextView.setLayoutParams(params1);
         quantityNameTextView.setGravity(Gravity.START);
-        quantityNameTextView.setPadding(5,0,5,0);
+        quantityNameTextView.setPadding(20,0,5,10);
+        quantityNameTextView.setSingleLine(false);
+        quantityNameTextView.setVerticalScrollBarEnabled(true);
+        quantityNameTextView.setMaxWidth(width*5/8);
+
+        // Set layout params for price
         params1 = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
+        params1.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         priceTextView.setLayoutParams(params1);
         priceTextView.setGravity(Gravity.END);
-        priceTextView.setPadding(5,20,5,20);
+        priceTextView.setPadding(5,20,20,20);
+
+
+
 
         // Add child views
         layout.addView(quantityNameTextView);
@@ -146,11 +201,42 @@ public class MyPendingOrdersFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 int id = view.getId();
+                RestaurantMenu menu = new SharedPrefManager<RestaurantMenu>().fetchObj(getString(R.string.key_restaurant_menu),getContext(),RestaurantMenu.class);
+                MenuItem item = menu.findItem(id);
+
+                // Start RestaurantMenuItemActivity
+                Intent intent = new Intent(getContext(),RestaurantMenuItemActivity.class);
+                intent.putExtra(getString(R.string.key_menu_item),item);
+                startActivity(intent);
             }
         });
 
-    }
-    public void onOrderNowClick(View v){
+        // Add row to table
+        table.addView(layout);
 
+        uniqueItemsOrdered++;
     }
+
+    private void deleteAllMenuItemTableEntry(){
+        table.removeAllViews();
+        uniqueItemsOrdered = 0;
+    }
+
+    public void onOrderNowClick(View v){
+        // TODO: Ask for user confirmation
+
+        // TODO: Post to server
+
+        // Delete all pending orders if POST success
+        SharedPrefManager<FoodBatchOrder> prefManager = new SharedPrefManager<>();
+        pendingOrders = null;
+        prefManager.saveObj(getString(R.string.key_batch_orders),pendingOrders,getContext());
+
+        // Go back
+        getActivity().onBackPressed();
+
+        // Inform user of success
+        Toast.makeText(getContext(),getString(R.string.toast_order_sent_success),Toast.LENGTH_SHORT).show();
+    }
+
 }

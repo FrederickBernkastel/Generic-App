@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.frederic.genericapp.MyPendingOrdersFragment">
+    tools:context="com.example.frederic.genericapp.Fragments.MyPendingOrdersFragment">
 
 
     <ScrollView
@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1">
         <TextView
+            android:id="@+id/pending_orders_fragment_price_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -45,6 +46,7 @@
             />
     </RelativeLayout>
     <Button
+        android:id="@+id/pending_orders_fragment_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10sp"
@@ -54,7 +56,6 @@
         android:textSize="40sp"
         android:textColor="#000000"
 
-        android:backgroundTint="#00FF00"
-        android:onClick="onOrderNowClick"/>
+        android:backgroundTint="#00FF00"/>
 
 </LinearLayout>

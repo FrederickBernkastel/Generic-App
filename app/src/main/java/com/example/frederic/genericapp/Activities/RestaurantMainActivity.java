@@ -1,9 +1,7 @@
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -11,6 +9,12 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.frederic.genericapp.Data.DatabaseConnector;
+import com.example.frederic.genericapp.Data.RestaurantMenu;
+import com.example.frederic.genericapp.ImageResize;
+import com.example.frederic.genericapp.R;
+import com.example.frederic.genericapp.SharedPrefManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -56,7 +60,7 @@ public class RestaurantMainActivity extends AppCompatActivity{
         //Test
         try {
             // TODO: INSERT RESTAURANT MENU FOR DEBUGGING, DELETE WHEN DONE
-            /*JSONArray array = new JSONArray();
+            JSONArray array = new JSONArray();
             JSONObject json=new JSONObject();
             json.put("name","Ugandan Cuisine");
             json.put("imagehyperlink","http://a57.foxnews.com/media2.foxnews.com/2016/06/09/640/360/060916_chew_crispychicken_1280.jpg");
@@ -103,7 +107,7 @@ public class RestaurantMainActivity extends AppCompatActivity{
             json.put("menu",array);
             String s = json.toString();
             RestaurantMenu savedMenu = DatabaseConnector.parseJSONMenu(s);
-            new SharedPrefManager<RestaurantMenu>().saveObj(getString(R.string.key_restaurant_menu),savedMenu,RestaurantMainActivity.this);*/
+            new SharedPrefManager<RestaurantMenu>().saveObj(getString(R.string.key_restaurant_menu),savedMenu,RestaurantMainActivity.this);
             // END OF DELETE PORTION
 
             // Fetch restaurant menu from sharedPreferences

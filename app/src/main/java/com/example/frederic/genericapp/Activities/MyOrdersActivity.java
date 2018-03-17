@@ -1,12 +1,15 @@
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Activities;
 
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.frederic.genericapp.Fragments.MyPendingOrdersFragment;
+import com.example.frederic.genericapp.R;
 
 /**
  * Class with tabs to display pending / sent orders
@@ -32,6 +35,10 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
         //Creating our pager adapter
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), mTabLayout.getTabCount());
 
+        mViewPager.setAdapter(adapter);
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+
+
     }
 
     @Override
@@ -51,9 +58,9 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
 }
 
 
-class PagerAdapter extends FragmentStatePagerAdapter{
+class PagerAdapter extends FragmentPagerAdapter {
     int mNumOfTabs;
-    public PagerAdapter(FragmentManager fm,int NumOfTabs){
+    PagerAdapter(FragmentManager fm,int NumOfTabs){
         super(fm);
         mNumOfTabs = NumOfTabs;
     }
@@ -62,8 +69,9 @@ class PagerAdapter extends FragmentStatePagerAdapter{
     public Fragment getItem(int position) {
         switch(position){
             case 0:
-                MyPendingOrdersFragment tab0 = new MyPendingOrdersFragment();
-                return tab0;
+                return new MyPendingOrdersFragment();
+            case 1:
+                return null;
             default:
                 return null;
         }

@@ -1,4 +1,4 @@
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -11,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.frederic.genericapp.Activities.RestaurantTableInputActivity;
+import com.example.frederic.genericapp.R;
 
 import java.util.ArrayList;
 

@@ -2,7 +2,7 @@
     Main Menu Activity
 */
 
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Activities;
 
 import android.app.Activity;
 
@@ -15,6 +15,8 @@ import android.view.View;
 
 import android.widget.Button;
 import android.widget.RelativeLayout;
+
+import com.example.frederic.genericapp.R;
 
 /**
  * Main menu of activity
@@ -49,6 +51,10 @@ public class MainActivity extends Activity {
 
 
     public void onGuestButtonClick(View v){
+        // DEBUG PORTION
+        Intent intentDebug = new Intent(MainActivity.this, RestaurantMainActivity.class);
+        startActivity(intentDebug);
+        // END OF DEBUG PORTION
         Intent intent = new Intent(MainActivity.this, RestaurantTableInputActivity.class);
         startActivity(intent);
     }

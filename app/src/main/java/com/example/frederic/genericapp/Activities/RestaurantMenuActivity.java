@@ -1,4 +1,4 @@
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Activities;
 
 
 
@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.widget.TextView;
+
+import com.example.frederic.genericapp.R;
+import com.example.frederic.genericapp.Fragments.RestaurantMenuFragment;
 
 public class RestaurantMenuActivity extends FragmentActivity{
     int height;

@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,16 +19,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RestaurantTableInputActivity"
+            android:name=".Activities.RestaurantTableInputActivity"
             android:label="GenericApp">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".RestaurantMainActivity" />
-        <activity android:name=".RestaurantMenuActivity" />
-        <activity android:name=".RestaurantMenuItemActivity" />
-        <activity android:name=".MyOrdersActivity"></activity>
+        <activity android:name=".Activities.RestaurantMainActivity" />
+        <activity android:name=".Activities.RestaurantMenuActivity" />
+        <activity android:name=".Activities.RestaurantMenuItemActivity" />
+        <activity android:name=".Activities.MyOrdersActivity"></activity>
     </application>
 
 </manifest>

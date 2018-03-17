@@ -1,23 +1,29 @@
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Activities;
 
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
-import android.service.autofill.FillEventHistory;
-import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.frederic.genericapp.Data.AsyncFetchResponse;
+import com.example.frederic.genericapp.Data.DatabaseConnector;
+import com.example.frederic.genericapp.Data.FetchedObject;
+import com.example.frederic.genericapp.Data.RestaurantMenu;
+import com.example.frederic.genericapp.Data.TableNumResponse;
+import com.example.frederic.genericapp.ImageResize;
+import com.example.frederic.genericapp.Fragments.PeopleFragment;
+import com.example.frederic.genericapp.R;
+import com.example.frederic.genericapp.SharedPrefManager;
+import com.example.frederic.genericapp.Fragments.TableFragment;
 
 import java.util.ArrayList;
 
@@ -26,7 +32,7 @@ import static android.media.CamcorderProfile.get;
 public class RestaurantTableInputActivity extends AppCompatActivity implements AsyncFetchResponse {
     private ArrayList<TextView> textViewList;
     private int textViewListPtr=0;
-    static ArrayList<TextView> viewList;
+    public static ArrayList<TextView> viewList;
     enum FetchState{
         ISPEOPLE,
         ISTABLE,

@@ -12,7 +12,7 @@ import com.google.gson.Gson;
  * @param <T>       Type of object to save
  * Created by: Frederick Bernkastel
  */
-class SharedPrefManager <T>{
+public class SharedPrefManager <T>{
 
     static private final String PREFERENCEFILEKEY = "com.example.frederic.genericapp.preferencefilekey";
 
@@ -23,7 +23,7 @@ class SharedPrefManager <T>{
      * @param context   Activity context ( = getActivity() or ActivityClass.this)
      * @return true
      */
-    boolean saveObj(String key, T obj,Context context){
+    public boolean saveObj(String key, T obj,Context context){
         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCEFILEKEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         String value = new Gson().toJson(obj);
@@ -39,7 +39,7 @@ class SharedPrefManager <T>{
      * @param tClass    Class type to fetch ( Menu.class )
      * @return
      */
-    T fetchObj(String key,Context context,Class<T> tClass){
+    public T fetchObj(String key,Context context,Class<T> tClass){
         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCEFILEKEY, Context.MODE_PRIVATE);
         String value = sharedPref.getString(key,null);
         if (value==null){

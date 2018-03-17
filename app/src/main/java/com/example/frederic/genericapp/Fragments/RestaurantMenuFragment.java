@@ -1,4 +1,4 @@
-package com.example.frederic.genericapp;
+package com.example.frederic.genericapp.Fragments;
 
 
 import android.content.Intent;
@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,6 +17,13 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+
+import com.example.frederic.genericapp.Activities.RestaurantMenuItemActivity;
+import com.example.frederic.genericapp.Data.MenuItem;
+import com.example.frederic.genericapp.Data.RestaurantMenu;
+import com.example.frederic.genericapp.ImageResize;
+import com.example.frederic.genericapp.R;
+import com.example.frederic.genericapp.SharedPrefManager;
 
 import java.util.HashMap;
 

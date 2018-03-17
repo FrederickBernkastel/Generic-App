@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbars="vertical"
-    tools:context="com.example.frederic.genericapp.RestaurantMenuFragment">
+    tools:context="com.example.frederic.genericapp.Fragments.RestaurantMenuFragment">
 
     <TableLayout
         android:id="@+id/restaurant_menu_table_layout"
