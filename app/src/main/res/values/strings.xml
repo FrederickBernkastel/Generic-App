@@ -18,6 +18,9 @@
     <string name="order_now">ORDER NOW</string>
     <string name="pending_orders">Pending Orders</string>
     <string name="toast_order_sent_success">Order sent to kitchen</string>
+    <string name="confirm_order">Send order to kitchen?</string>
+    <string name="confirm_order_yes">Yes</string>
+    <string name="confirm_order_cancel">Cancel</string>
 
     <string name="credits">
         Chef icon made by Monkik from flaticon.com\n

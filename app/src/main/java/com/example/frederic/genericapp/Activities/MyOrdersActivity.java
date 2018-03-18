@@ -1,5 +1,7 @@
 package com.example.frederic.genericapp.Activities;
 
+import android.app.DialogFragment;
+
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -7,17 +9,22 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.example.frederic.genericapp.Data.FoodBatchOrder;
+import com.example.frederic.genericapp.Fragments.ConfirmOrderDialogFragment;
 import com.example.frederic.genericapp.Fragments.MyPendingOrdersFragment;
 import com.example.frederic.genericapp.R;
+import com.example.frederic.genericapp.SharedPrefManager;
 
 /**
  * Class with tabs to display pending / sent orders
  * Created by: Frederick Bernkastel
  */
-public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener{
+public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MyPendingOrdersFragment.ConfirmOrderListener, ConfirmOrderDialogFragment.ConfirmOrderDialogListener{
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
+    private FoodBatchOrder pendingOrders;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +46,7 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
 
 
+
     }
 
     @Override
@@ -55,12 +63,37 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
     public void onTabReselected(TabLayout.Tab tab) {
 
     }
+
+    @Override
+    public void onConfirmSelected(MyPendingOrdersFragment fragment) {
+        // Recording orders
+        pendingOrders = fragment.pendingOrders;
+
+        // Launch Dialog Fragment
+        new ConfirmOrderDialogFragment().show(getFragmentManager(),"ConfirmOrderDialogFragment");
+    }
+
+    @Override
+    public void onDialogConfirm(android.app.Fragment fragment) {
+        // TODO: Post to server
+
+        // Delete all pending orders if POST success
+        SharedPrefManager<FoodBatchOrder> prefManager = new SharedPrefManager<>();
+        pendingOrders = null;
+        prefManager.saveObj(getString(R.string.key_batch_orders),pendingOrders,MyOrdersActivity.this);
+
+        // Go back
+        onBackPressed();
+
+        // Inform user of success
+        Toast.makeText(MyOrdersActivity.this,getString(R.string.toast_order_sent_success),Toast.LENGTH_SHORT).show();
+    }
 }
 
 
 class PagerAdapter extends FragmentPagerAdapter {
     int mNumOfTabs;
-    PagerAdapter(FragmentManager fm,int NumOfTabs){
+    PagerAdapter(FragmentManager fm, int NumOfTabs){
         super(fm);
         mNumOfTabs = NumOfTabs;
     }
