@@ -1,8 +1,11 @@
 package com.example.frederic.genericapp.Data;
 
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -13,18 +16,35 @@ import java.util.ArrayList;
 
 public class FoodStatuses extends FetchedObject{
     public ArrayList<Integer> foodIDs;
-    public SparseArray<FoodStatus> statuses;
+    public ArrayList<FoodStatus> statuses;
+    private SparseArray<FoodStatus> statusesSparse;
     public FoodStatuses(){
-        statuses = new SparseArray<>();
+        statuses = new ArrayList<>();
         foodIDs = new ArrayList<>();
+        statusesSparse = new SparseArray<>();
     }
     public void addStatus(int id,boolean delivered){
-        FoodStatus foodStatus;
-        if ((foodStatus = statuses.get(id)) == null){
+
+
+        FoodStatus foodStatus = statusesSparse.get(id);
+
+        if (foodStatus == null){
             foodStatus = new FoodStatus(id);
             foodIDs.add(id);
+            statuses.add(foodStatus);
         }
         foodStatus.appendStatus(delivered);
-        statuses.append(id,foodStatus);
+        statusesSparse.append(id,foodStatus);
+    }
+
+    /**
+     * Sort statuses, such that items with more unfulfilled quantities appear first, followed by items with higher quantities
+     */
+    public void sortStatuses(){
+        Collections.sort(statuses);
+    }
+
+    public FoodStatus getStatus(int foodid){
+        return statusesSparse.get(foodid);
     }
 }

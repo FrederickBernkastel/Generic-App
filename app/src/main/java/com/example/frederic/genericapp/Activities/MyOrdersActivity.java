@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.frederic.genericapp.Data.FoodBatchOrder;
 import com.example.frederic.genericapp.Fragments.ConfirmOrderDialogFragment;
+import com.example.frederic.genericapp.Fragments.MyCurrentOrdersFragment;
 import com.example.frederic.genericapp.Fragments.MyPendingOrdersFragment;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
@@ -37,6 +38,7 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
 
         // Add tabs to tabLayout
         mTabLayout.addTab(mTabLayout.newTab().setText(getString(R.string.pending_orders)));
+        mTabLayout.addTab(mTabLayout.newTab().setText(getString(R.string.sent_orders)));
         mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         //Creating our pager adapter
@@ -45,7 +47,8 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
         mViewPager.setAdapter(adapter);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
 
-
+        // Set listener to tab's layout onClick
+        mTabLayout.addOnTabSelectedListener(MyOrdersActivity.this);
 
     }
 
@@ -104,7 +107,7 @@ class PagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return new MyPendingOrdersFragment();
             case 1:
-                return null;
+                return new MyCurrentOrdersFragment();
             default:
                 return null;
         }
