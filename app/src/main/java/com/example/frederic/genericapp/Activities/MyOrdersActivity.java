@@ -11,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.example.frederic.genericapp.Data.AsyncFetchResponse;
+import com.example.frederic.genericapp.Data.AsyncPostResponse;
+import com.example.frederic.genericapp.Data.DatabaseConnector;
 import com.example.frederic.genericapp.Data.FoodBatchOrder;
 import com.example.frederic.genericapp.Fragments.ConfirmOrderDialogFragment;
 import com.example.frederic.genericapp.Fragments.MyCurrentOrdersFragment;
@@ -22,7 +25,7 @@ import com.example.frederic.genericapp.SharedPrefManager;
  * Class with tabs to display pending / sent orders
  * Created by: Frederick Bernkastel
  */
-public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MyPendingOrdersFragment.ConfirmOrderListener, ConfirmOrderDialogFragment.ConfirmOrderDialogListener{
+public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MyPendingOrdersFragment.ConfirmOrderListener, ConfirmOrderDialogFragment.ConfirmOrderDialogListener, AsyncPostResponse{
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
     private FoodBatchOrder pendingOrders;
@@ -78,8 +81,30 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
 
     @Override
     public void onDialogConfirm(android.app.Fragment fragment) {
-        // TODO: Post to server
+        // Post to server
+        String plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyOrdersActivity.this,String.class);
+        DatabaseConnector.PostTaskOutput output;
+        try {
+            output = new DatabaseConnector.PostTaskOutput(plid, pendingOrders);
+        } catch (Exception e){
+            System.out.println("Error parsing DatabaseConnector input in MyOrdersActivity.");
+            // Terminate this activity, and close entire app
+            this.finish();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            return;
+        }
+        new DatabaseConnector.PostTask(MyOrdersActivity.this).execute(output);
 
+
+
+    }
+
+    @Override
+    public void postFinish(int response) {
+        if (response<=-1){
+            // TODO: Error posting to server, launch ErrorActivity
+            return;
+        }
         // Delete all pending orders if POST success
         SharedPrefManager<FoodBatchOrder> prefManager = new SharedPrefManager<>();
         pendingOrders = null;

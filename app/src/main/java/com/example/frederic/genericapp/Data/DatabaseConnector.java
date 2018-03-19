@@ -28,7 +28,7 @@ import java.util.Locale;
  */
 public class DatabaseConnector {
 
-    private static final String SERVERURLSTRING = "http://10.12.184.102:4995/api";
+    private static final String SERVERURLSTRING = "http://10.12.79.231:4995/api";
     private static final String CHARSET = "UTF-8";
 
     public enum FetchMode{
@@ -224,7 +224,7 @@ public class DatabaseConnector {
      * Returns null on error, else a FetchedObject
      */
     public static class FetchTask extends AsyncTask<FetchTaskInput, Void, FetchedObject> {
-        public AsyncFetchResponse delegate=null;
+        AsyncFetchResponse delegate=null;
         public FetchTask(AsyncFetchResponse delegate){
             this.delegate = delegate;
         }
@@ -273,6 +273,7 @@ public class DatabaseConnector {
                             break;
 
                     }
+                    fetchedObject.fetchMode = fetchTaskInput.fetchMode;
 
 
                 } else {
@@ -320,12 +321,12 @@ public class DatabaseConnector {
     /**
      * Output information for posting data using AsyncTask
      */
-    static class PostTaskOutput{
+    public static class PostTaskOutput{
         String ServerURLString;
         byte[] JSONData;
         String paylahID;
 
-        PostTaskOutput(String paylahID, FoodBatchOrder batchOrder) throws UnsupportedEncodingException{
+        public PostTaskOutput(String paylahID, FoodBatchOrder batchOrder) throws UnsupportedEncodingException{
             this.paylahID = paylahID;
             String ServerURLTail =String.format(Locale.US,"/make_order?plid=%d",paylahID);
             this.ServerURLString = SERVERURLSTRING + ServerURLTail;
@@ -333,9 +334,19 @@ public class DatabaseConnector {
 
         }
     }
-    public static class PostTask extends AsyncTask<PostTaskOutput,Void,Void>{
+
+    /**
+     * AsyncTask to post JSON code to database
+     * Returns -1 on failure, 0 otherwise
+     */
+    public static class PostTask extends AsyncTask<PostTaskOutput,Void,Integer>{
+
+        AsyncPostResponse delegate = null;
+
+        public PostTask(AsyncPostResponse delegate){this.delegate = delegate;}
+
         @Override
-        protected Void doInBackground(PostTaskOutput... params) {
+        protected Integer doInBackground(PostTaskOutput... params) {
             PostTaskOutput postTaskOutput = params[0];
             String paylahID = postTaskOutput.paylahID;
 
@@ -359,9 +370,17 @@ public class DatabaseConnector {
             } catch (IOException e){
                 Log.e("Server Error","Error connecting to server in DatabaseConnector");
                 Log.e("Server Error",e.getMessage());
-                return null;
+                return -1;
             }
-            return null;
+            return 0;
+        }
+
+        @Override
+        protected void onPostExecute(Integer response) {
+            super.onPostExecute(response);
+            if (delegate!=null) {
+                delegate.postFinish(response);
+            }
         }
     }
 }

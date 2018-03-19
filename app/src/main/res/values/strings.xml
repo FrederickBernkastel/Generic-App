@@ -38,6 +38,7 @@
     <string name="key_menu_item">menu_item</string>
     <string name="key_batch_orders">food_orders</string>
     <string name="key_plid">plid</string>
+    <string name="key_table_no">table_no</string>
 
 
 

@@ -22,6 +22,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import com.example.frederic.genericapp.Data.AsyncFetchResponse;
+import com.example.frederic.genericapp.Data.DatabaseConnector;
+import com.example.frederic.genericapp.Data.FetchedObject;
+import com.example.frederic.genericapp.Data.FoodStatuses;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
 
@@ -29,7 +33,7 @@ import com.example.frederic.genericapp.SharedPrefManager;
  * Main menu of activity
  * Created by: Frederick Bernkastel
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AsyncFetchResponse{
 
     final int PERMISSION_TO_READ_NUMBER = 1;
     String plid;
@@ -38,18 +42,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Check if phone number exists
-        this.plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MainActivity.this,String.class);
-        // Extract phone number if it does not exists
-        if(plid==null) {
-            tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)!= PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_PHONE_STATE},PERMISSION_TO_READ_NUMBER);
-            }
-
-        }
-
-        // TODO: Check for unpaid bills
 
         setContentView(R.layout.activity_main);
 
@@ -72,13 +64,42 @@ public class MainActivity extends Activity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Check if phone number exists
+        this.plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MainActivity.this,String.class);
+        // Extract phone number if it does not exists
+        if(plid==null) {
+            tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)!= PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_PHONE_STATE},PERMISSION_TO_READ_NUMBER);
+            }
 
+        }
+
+        // Check for unpaid bills
+        DatabaseConnector.FetchTaskInput input;
+        try {
+            input = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.EXISTINGORDERS);
+        } catch (Exception e){
+            System.out.println("Error parsing DatabaseConnector input in MainActivity. Was the correct mode used?");
+            // Terminate this activity, and close entire app
+            this.finish();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            return;
+        }
+
+        new DatabaseConnector.FetchTask(this).execute(input);
+    }
 
     public void onGuestButtonClick(View v){
+        /*
         // DEBUG PORTION
         Intent intentDebug = new Intent(MainActivity.this, RestaurantMainActivity.class);
         startActivity(intentDebug);
         // END OF DEBUG PORTION
+        */
         Intent intent = new Intent(MainActivity.this, RestaurantTableInputActivity.class);
         startActivity(intent);
     }
@@ -98,7 +119,7 @@ public class MainActivity extends Activity {
                         new SharedPrefManager<String>().saveObj(getString(R.string.key_plid),this.plid,MainActivity.this);
 
                     } catch (SecurityException e){
-                        // TODO: Exception in getting phone number (no SIM card?) Time for plan B
+                        // TODO: Exception in getting phone number (no SIM card / encrypted SIM card?) Time for plan B
                     }
 
 
@@ -110,5 +131,17 @@ public class MainActivity extends Activity {
         }
     }
 
-
+    @Override
+    public void fetchFinish(FetchedObject output) {
+        // Check if fetchObject is null
+        if (output==null){
+            // TODO: Unable to connect to server, link to ErrorActivity
+        }
+        FoodStatuses foodStatuses = (FoodStatuses) output;
+        if(foodStatuses.statuses.size()>0){
+            // Server indicates that there are unpaid bills, launch restaurant menu
+            Intent intent = new Intent(MainActivity.this, RestaurantMainActivity.class);
+            startActivity(intent);
+        }
+    }
 }

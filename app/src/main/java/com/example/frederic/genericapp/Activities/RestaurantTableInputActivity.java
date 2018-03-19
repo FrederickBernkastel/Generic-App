@@ -258,13 +258,16 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
     // TODO: Handle output of DatabaseConnector.FetchTask
     @Override
     public void fetchFinish(FetchedObject output) {
-        switch(currState) {
-            case ISTABLE:
+        switch(output.fetchMode) {
+            case TABLENO:
                 TableNumResponse tableNumResponse = (TableNumResponse) output;
                 if (tableNumResponse.isInvalidTableNum) {
                     // TODO: add toast
                     return;
                 }
+                // Save valid table number
+                new SharedPrefManager<Integer>().saveObj(getString(R.string.key_table_no),tableNumber,RestaurantTableInputActivity.this);
+
                 if (tableNumResponse.isPeopleNumRequired) {
                     TextView textView = findViewById(R.id.backConfirmButton);
                     FragmentManager fragmentManager = getFragmentManager();
@@ -281,11 +284,11 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
                 instantiateMenu();
                 break;
 
-            case ISPEOPLE:
+            case PEOPLENO:
                 instantiateMenu();
                 break;
 
-            case ISMENU:
+            case MENU:
                 RestaurantMenu restaurantMenu = (RestaurantMenu) output;
                 SharedPrefManager<RestaurantMenu> saveMenu = new SharedPrefManager<>();
                 saveMenu.saveObj(getResources().getString(R.string.key_restaurant_menu), restaurantMenu, this);

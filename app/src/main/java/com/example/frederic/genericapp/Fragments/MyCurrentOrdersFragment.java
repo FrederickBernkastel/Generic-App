@@ -65,7 +65,8 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
         priceLabelTextView = v.findViewById(R.id.current_orders_fragment_price_label);
         table = v.findViewById(R.id.current_orders_fragment_table);
 
-        // TODO: Extract plid
+        // Extract plid
+        plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),getContext(),String.class);
 
         return v;
     }

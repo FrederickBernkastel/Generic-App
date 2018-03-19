@@ -10,7 +10,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.frederic.genericapp.Data.AsyncFetchResponse;
 import com.example.frederic.genericapp.Data.DatabaseConnector;
+import com.example.frederic.genericapp.Data.FetchedObject;
+import com.example.frederic.genericapp.Data.FoodStatuses;
 import com.example.frederic.genericapp.Data.RestaurantMenu;
 import com.example.frederic.genericapp.ImageResize;
 import com.example.frederic.genericapp.R;
@@ -22,8 +25,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class RestaurantMainActivity extends AppCompatActivity{
+public class RestaurantMainActivity extends AppCompatActivity implements AsyncFetchResponse{
     RestaurantMenu menu;
+    boolean noOrders;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +63,7 @@ public class RestaurantMainActivity extends AppCompatActivity{
 
         //Test
         try {
+            /*
             // TODO: INSERT RESTAURANT MENU FOR DEBUGGING, DELETE WHEN DONE
             JSONArray array = new JSONArray();
             JSONObject json=new JSONObject();
@@ -109,6 +114,7 @@ public class RestaurantMainActivity extends AppCompatActivity{
             RestaurantMenu savedMenu = DatabaseConnector.parseJSONMenu(s);
             new SharedPrefManager<RestaurantMenu>().saveObj(getString(R.string.key_restaurant_menu),savedMenu,RestaurantMainActivity.this);
             // END OF DELETE PORTION
+            */
 
             // Fetch restaurant menu from sharedPreferences
             RestaurantMenu menu = new SharedPrefManager<RestaurantMenu>().fetchObj(getString(R.string.key_restaurant_menu),RestaurantMainActivity.this,RestaurantMenu.class);
@@ -128,11 +134,37 @@ public class RestaurantMainActivity extends AppCompatActivity{
             System.out.println("FAIL");
             System.out.println(e.getMessage());
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        noOrders = false;
+        int tableNo = new SharedPrefManager<Integer>().fetchObj(getString(R.string.key_table_no),RestaurantMainActivity.this,Integer.class);
+        String plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),RestaurantMainActivity.this,String.class);
+        DatabaseConnector.FetchTaskInput menuInput;
+        DatabaseConnector.FetchTaskInput orderInput;
+        try {
+            menuInput = new DatabaseConnector.FetchTaskInput(plid, tableNo, DatabaseConnector.FetchMode.MENU);
+            orderInput = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.EXISTINGORDERS);
+        } catch (Exception e){
+            System.out.println("Error parsing DatabaseConnector input in RestaurantMainActivity. Was the correct mode used?");
+            // Terminate this activity, and close entire app
+            this.finish();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            return;
+        }
+        // Re-fetch restaurant menu in background
+        new DatabaseConnector.FetchTask(RestaurantMainActivity.this).execute(menuInput);
+
+        // Check if any orders placed in background
+        new DatabaseConnector.FetchTask(RestaurantMainActivity.this).execute(orderInput);
 
     }
+
     // TODO: Backtrack to MainActivity, iff nothing ordered yet, or no time
     public void onRestaurantMainBackClick(View v){
-
+        onBackPressed();
     }
     // TODO: Implement
     public void onRestaurantMainHotDishClick(View v){
@@ -156,9 +188,28 @@ public class RestaurantMainActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
         //TODO: Allow onBackPressed iff no orders sent to kitchen, or no time
-        //super.onBackPressed();
+        if (noOrders) {
+            super.onBackPressed();
+        }
     }
 
+    @Override
+    public void fetchFinish(FetchedObject output) {
+        if(output == null){
+            // TODO: No connection? Launch ErrorActivity
+        }
+        switch(output.fetchMode){
+            case MENU:
+                // Re-save menu
+                menu = (RestaurantMenu) output;
+                new SharedPrefManager<RestaurantMenu>().saveObj(getString(R.string.key_restaurant_menu),menu,RestaurantMainActivity.this);
+                break;
+            case EXISTINGORDERS:
+                // Re-load existing orders
+                FoodStatuses statuses = (FoodStatuses) output;
+                noOrders = statuses.statuses.size()==0;
+                break;
 
-
+        }
+    }
 }

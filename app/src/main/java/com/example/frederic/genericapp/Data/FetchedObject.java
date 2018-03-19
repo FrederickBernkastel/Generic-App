@@ -15,6 +15,7 @@ import java.util.Locale;
  */
 public class FetchedObject {
     public String response;
+    public DatabaseConnector.FetchMode fetchMode;
 }
 
 
