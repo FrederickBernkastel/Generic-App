@@ -50,7 +50,7 @@ public class MyPendingOrdersFragment extends Fragment {
     ConfirmOrderListener mListener;
 
     public interface ConfirmOrderListener{
-        public void onConfirmSelected(MyPendingOrdersFragment fragment);
+        void onConfirmSelected(MyPendingOrdersFragment fragment);
     }
     public MyPendingOrdersFragment() {
         // Required empty public constructor
@@ -125,6 +125,7 @@ public class MyPendingOrdersFragment extends Fragment {
                 continue;
             }
             MenuItem menuItem = menu.findItem(foodOrder.foodId);
+
             insertMenuItemTableEntry(menuItem);
             double itemPrice;
             try{

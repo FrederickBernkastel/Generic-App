@@ -136,6 +136,7 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
         // Check if fetchObject is null
         if (output==null){
             // TODO: Unable to connect to server, link to ErrorActivity
+            return;
         }
         FoodStatuses foodStatuses = (FoodStatuses) output;
         if(foodStatuses.statuses.size()>0){

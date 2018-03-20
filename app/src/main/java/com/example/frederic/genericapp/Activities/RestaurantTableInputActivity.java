@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.transition.TransitionManager;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import com.example.frederic.genericapp.Data.AsyncFetchResponse;
 import com.example.frederic.genericapp.Data.DatabaseConnector;
 import com.example.frederic.genericapp.Data.FetchedObject;
+import com.example.frederic.genericapp.Data.FoodBatchOrder;
 import com.example.frederic.genericapp.Data.RestaurantMenu;
 import com.example.frederic.genericapp.Data.TableNumResponse;
 import com.example.frederic.genericapp.ImageResize;
@@ -192,7 +195,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
             for ( int i = 0; i < viewList.size(); i++){
                 checkValid += viewList.get(i).getText().toString();
             }
-            int numbah = (Integer) Integer.parseInt(checkValid);
+            int numbah = Integer.parseInt(checkValid);
 
             if ( numbah == 0 && currState == FetchState.ISPEOPLE){
                 // TODO: add toast
@@ -258,6 +261,10 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
     // TODO: Handle output of DatabaseConnector.FetchTask
     @Override
     public void fetchFinish(FetchedObject output) {
+        if (output==null){
+            // TODO: Server failed to respond, launch ErrorActivity
+            return;
+        }
         switch(output.fetchMode) {
             case TABLENO:
                 TableNumResponse tableNumResponse = (TableNumResponse) output;
@@ -268,7 +275,11 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
                 // Save valid table number
                 new SharedPrefManager<Integer>().saveObj(getString(R.string.key_table_no),tableNumber,RestaurantTableInputActivity.this);
 
+                // Wipe previous pending_orders
+                new SharedPrefManager<FoodBatchOrder>().saveObj(getString(R.string.key_batch_orders),new FoodBatchOrder(),RestaurantTableInputActivity.this);
+
                 if (tableNumResponse.isPeopleNumRequired) {
+                    TransitionManager.beginDelayedTransition((ViewGroup) findViewById(R.id.fragment_container));
                     TextView textView = findViewById(R.id.backConfirmButton);
                     FragmentManager fragmentManager = getFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

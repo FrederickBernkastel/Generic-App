@@ -197,6 +197,7 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
     public void fetchFinish(FetchedObject output) {
         if(output == null){
             // TODO: No connection? Launch ErrorActivity
+            return;
         }
         switch(output.fetchMode){
             case MENU:

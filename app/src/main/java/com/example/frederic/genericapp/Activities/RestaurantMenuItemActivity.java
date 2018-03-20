@@ -1,14 +1,19 @@
 package com.example.frederic.genericapp.Activities;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -134,6 +139,12 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
             priceTextView.setText(price);
             // Hide description if quantity is not 0
             if (itemQuantity==0) {
+                // Slide description upwards
+                if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+                    Transition t = new Slide(Gravity.TOP);
+                    t.setDuration(1000);
+                    TransitionManager.beginDelayedTransition((ViewGroup)findViewById(R.id.restaurant_menu_item_special_request_table),t);
+                }
                 TextView descriptionTextView = findViewById(R.id.restaurant_menu_item_description);
                 descriptionTextView.setVisibility(View.GONE);
                 createNewSpecialRequestRow();

@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 
@@ -105,7 +106,7 @@ public class DatabaseConnector {
      * @param s         Json String to be parsed
      * @return          TableNumResponse containing formatted information about response
      */
-    public static TableNumResponse parseJSONTableNumResponse(String s){
+    private static TableNumResponse parseJSONTableNumResponse(String s){
         // Possible server responses to GET request
         final String NUMPEOPLETRUE = "True";
         final String NUMPEOPLEFALSE = "False";
@@ -113,14 +114,18 @@ public class DatabaseConnector {
 
         // Interpret server response and modify relevant parameters
         TableNumResponse response = new TableNumResponse();
-        if(s.equals(INVALIDTABLENUMTRUE)){
-            response.isInvalidTableNum = true;
-        } else if(s.equals(NUMPEOPLETRUE)) {
-            response.isInvalidTableNum = false;
-            response.isPeopleNumRequired = true;
-        } else if (s.equals(NUMPEOPLEFALSE)){
-            response.isInvalidTableNum = false;
-            response.isPeopleNumRequired = false;
+        switch(s){
+            case INVALIDTABLENUMTRUE:
+                response.isInvalidTableNum = true;
+                break;
+            case NUMPEOPLETRUE:
+                response.isInvalidTableNum = false;
+                response.isPeopleNumRequired = true;
+                break;
+            case NUMPEOPLEFALSE:
+                response.isInvalidTableNum = false;
+                response.isPeopleNumRequired = false;
+                break;
         }
         System.out.println(String.valueOf(response.isPeopleNumRequired));
         return response;
@@ -128,10 +133,10 @@ public class DatabaseConnector {
 
     /**
      * Parse JSON file representing statuses of ordered items, and output FoodStatuses class
-     * @param       s
+     * @param       s represents JSON string with ordered items
      * @return      foodStatuses
      */
-    public static FoodStatuses parseFoodStatusResponse(String s){
+    private static FoodStatuses parseFoodStatusResponse(String s){
         /*  JSON FORMAT FOR INPUT FOOD STATUSES
             {
                 "orders": [ {
@@ -244,7 +249,6 @@ public class DatabaseConnector {
                 myConnection.setRequestMethod("GET");
                 myConnection.setRequestProperty("User-Agent", paylahID);
 
-
                 if (myConnection.getResponseCode() == 200) {
                     // Connection success, read string
                     InputStreamReader responseBodyReader = new InputStreamReader(myConnection.getInputStream(), CHARSET);
@@ -257,7 +261,9 @@ public class DatabaseConnector {
                         stringBuilder.append(response);
                     }
                     response = stringBuilder.toString();
-
+                    //DEBUG
+                    System.out.print("Server Response: ");
+                    System.out.println(response);
                     // Handle different GET requests
                     switch(fetchTaskInput.fetchMode){
                         case MENU:
@@ -286,6 +292,7 @@ public class DatabaseConnector {
                 Log.e("Server Error",e.getMessage());
                 return null;
             }
+            // debug
             return fetchedObject;
         }
 
@@ -308,13 +315,14 @@ public class DatabaseConnector {
         int totalOrders = batchOrder.foodOrders.size();
         StringBuilder sBuilder = new StringBuilder("{\"orders\":[");
         for(FoodOrder order:batchOrder.foodOrders){
-            String s = String.format(Locale.US,"{%d,\"%s\"}");
+            String s = String.format(Locale.US,"{%d,\"%s\"}",order.foodId,order.comment);
             sBuilder.append(s);
             if(++counter < totalOrders){
                 sBuilder.append(',');
             }
         }
         sBuilder.append("]}");
+        System.out.println(sBuilder.toString());
         return sBuilder.toString();
     }
 
@@ -326,11 +334,11 @@ public class DatabaseConnector {
         byte[] JSONData;
         String paylahID;
 
-        public PostTaskOutput(String paylahID, FoodBatchOrder batchOrder) throws UnsupportedEncodingException{
+        public PostTaskOutput(String paylahID, FoodBatchOrder batchOrder){
             this.paylahID = paylahID;
-            String ServerURLTail =String.format(Locale.US,"/make_order?plid=%d",paylahID);
+            String ServerURLTail = String.format(Locale.US,"/make_order?plid=%s",paylahID);
             this.ServerURLString = SERVERURLSTRING + ServerURLTail;
-            this.JSONData = constructJSON(batchOrder).getBytes(CHARSET);
+            this.JSONData = constructJSON(batchOrder).getBytes(StandardCharsets.UTF_8);
 
         }
     }

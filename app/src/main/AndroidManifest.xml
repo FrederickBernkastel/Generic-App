@@ -3,7 +3,7 @@
     package="com.example.frederic.genericapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -29,7 +29,8 @@
         <activity android:name=".Activities.RestaurantMainActivity" />
         <activity android:name=".Activities.RestaurantMenuActivity" />
         <activity android:name=".Activities.RestaurantMenuItemActivity" />
-        <activity android:name=".Activities.MyOrdersActivity"></activity>
+        <activity android:name=".Activities.MyOrdersActivity" />
+        <activity android:name=".Activities.MyBillActivity"></activity>
     </application>
 
 </manifest>

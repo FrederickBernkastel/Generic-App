@@ -72,29 +72,18 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
+    public void onResume() {
+        super.onResume();
+        //DEBUG
+        System.out.println("Resuming");
         // Delete all previously loaded items
         table.removeAllViews();
 
         retrieveCurrentOrders();
-
-        repopulate_table();
     }
     private void retrieveCurrentOrders(){
 
-        // Get server data
-        DatabaseConnector.FetchTaskInput input;
-        try {
-            input = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.EXISTINGORDERS);
-        } catch(Exception e){
-            System.out.println("Error constructing DatabaseConnector input, was the wrong mode used?");
-            System.out.println(e.getMessage());
-            return;
-        }
-        // Starts AsyncTask
-        new DatabaseConnector.FetchTask(MyCurrentOrdersFragment.this).execute(input);
+
     }
     private void repopulate_table(){
 
@@ -114,7 +103,7 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
 
         for(FoodStatus foodStatus:foodStatuses.statuses){
             int foodId = foodStatus.food_id;
-
+            System.out.println(foodId);
             MenuItem menuItem = menu.findItem(foodId);
             insertMenuItemTableEntry(menuItem, foodStatus);
             double itemPrice;
@@ -180,6 +169,12 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
 
     @Override
     public void fetchFinish(FetchedObject output) {
+        System.out.println("FETCH FIN");
+        // TODO: Launch ErrorActivity
+        if (output==null){
+            System.out.println("Error connecting to server in CurrentOrdersFragment");
+            return;
+        }
         // Store data
         foodStatuses = (FoodStatuses) output;
         repopulate_table();
