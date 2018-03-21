@@ -16,6 +16,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -31,12 +33,14 @@ public class DatabaseConnector {
 
     private static final String SERVERURLSTRING = "http://10.12.79.231:4995/api";
     private static final String CHARSET = "UTF-8";
+    private static final int NUMOFCONNATTEMPTS = 3;
 
     public enum FetchMode{
         MENU,
         TABLENO,
         PEOPLENO,
-        EXISTINGORDERS
+        EXISTINGORDERS,
+        DELETESESSION
     }
 
 
@@ -84,8 +88,10 @@ public class DatabaseConnector {
                 String name = item.getString("name");
                 String description = item.getString("description");
                 String currency = item.getString("currency");
+
                 if (currency.charAt(0)=='*' && currency.length()>1){
                     price = price + " " + currency.substring(1);
+
                 } else if (currency.charAt(currency.length()-1)=='*' && currency.length()>1){
                     price = currency.substring(0,currency.length()-1) + " " + price;
                 } else {
@@ -215,6 +221,9 @@ public class DatabaseConnector {
                 case EXISTINGORDERS:
                     ServerURLTail = String.format(Locale.US,"/existing_orders?plid=%s",paylahID);
                     break;
+                case DELETESESSION:
+                    ServerURLTail = String.format(Locale.US,"/exit?plid=%s",paylahID);
+                    break;
                 default:
                     throw new Exception("Invalid FetchTaskInput parameters");
             }
@@ -237,63 +246,73 @@ public class DatabaseConnector {
         protected FetchedObject doInBackground(FetchTaskInput... params) {
             FetchTaskInput fetchTaskInput = params[0];
             String paylahID = fetchTaskInput.paylahID;
-            FetchedObject fetchedObject = new FetchedObject();
-            try {
-                // Create URL
-                URL serverURL = new URL(fetchTaskInput.ServerURLString);
+            FetchedObject fetchedObject= new FetchedObject();
 
-                // Create connection
-                HttpURLConnection myConnection = (HttpURLConnection) serverURL.openConnection();
+            // Try to connect to the server until attemptNo is exceeded
+            int attemptNo = 0;
+            while(true) {
 
-                // Set request Headers
-                myConnection.setRequestMethod("GET");
-                myConnection.setRequestProperty("User-Agent", paylahID);
-
-                if (myConnection.getResponseCode() == 200) {
-                    // Connection success, read string
-                    InputStreamReader responseBodyReader = new InputStreamReader(myConnection.getInputStream(), CHARSET);
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String response;
-
-
-                    BufferedReader bufferedReader = new BufferedReader(responseBodyReader);
-                    while ((response = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(response);
-                    }
-                    response = stringBuilder.toString();
+                try {
                     //DEBUG
-                    System.out.print("Server Response: ");
-                    System.out.println(response);
-                    // Handle different GET requests
-                    switch(fetchTaskInput.fetchMode){
-                        case MENU:
-                            fetchedObject = parseJSONMenu(response);
-                            break;
-                        case TABLENO:
-                            fetchedObject = parseJSONTableNumResponse(response);
-                            break;
-                        case PEOPLENO:
-                            break;
-                        case EXISTINGORDERS:
-                            fetchedObject = parseFoodStatusResponse(response);
-                            break;
+                    System.out.print("Connecting to: ");
+                    System.out.println(fetchTaskInput.ServerURLString);
 
+                    // Create URL
+                    URL serverURL = new URL(fetchTaskInput.ServerURLString);
+
+                    // Create connection
+                    HttpURLConnection myConnection = (HttpURLConnection) serverURL.openConnection();
+
+                    // Set request Headers
+                    myConnection.setRequestMethod("GET");
+                    myConnection.setRequestProperty("User-Agent", paylahID);
+
+                    if (myConnection.getResponseCode() == 200) {
+                        // Connection success, read string
+                        String response = readConnectionInput(myConnection);
+
+
+                        // DEBUG
+                        System.out.print("Server Fetch Response: ");
+                        System.out.println(response);
+                        // Handle different GET requests
+                        switch (fetchTaskInput.fetchMode) {
+                            case MENU:
+                                fetchedObject = parseJSONMenu(response);
+                                break;
+                            case TABLENO:
+                                fetchedObject = parseJSONTableNumResponse(response);
+                                break;
+                            case PEOPLENO:
+                                break;
+                            case EXISTINGORDERS:
+                                fetchedObject = parseFoodStatusResponse(response);
+                                break;
+                            case DELETESESSION:
+                                return null;
+
+                        }
+                        fetchedObject.fetchMode = fetchTaskInput.fetchMode;
+                        return fetchedObject;
+
+                    } else {
+                        // Connection failed
+                        throw new IOException("Response code error " + String.valueOf(myConnection.getResponseCode()));
                     }
-                    fetchedObject.fetchMode = fetchTaskInput.fetchMode;
 
-
-                } else {
-                    // Connection failed
-                    throw new IOException("Response code error" + String.valueOf(myConnection.getResponseCode()));
+                } catch (IOException e) {
+                    Log.e("Server Error", "Error connecting to server in DatabaseConnector");
+                    Log.e("Server Error", e.getMessage());
+                    // Return if maximum number of attempts exceeded
+                    if (attemptNo++>NUMOFCONNATTEMPTS) {
+                        return null;
+                    }
                 }
 
-            } catch (IOException e){
-                Log.e("Server Error","Error connecting to server in DatabaseConnector");
-                Log.e("Server Error",e.getMessage());
-                return null;
+
             }
-            // debug
-            return fetchedObject;
+
+
         }
 
         @Override
@@ -315,14 +334,13 @@ public class DatabaseConnector {
         int totalOrders = batchOrder.foodOrders.size();
         StringBuilder sBuilder = new StringBuilder("{\"orders\":[");
         for(FoodOrder order:batchOrder.foodOrders){
-            String s = String.format(Locale.US,"{%d,\"%s\"}",order.foodId,order.comment);
+            String s = String.format(Locale.US,"{\"food_id\":%d,\"comment\":\"%s\"}",order.foodId,order.comment);
             sBuilder.append(s);
             if(++counter < totalOrders){
                 sBuilder.append(',');
             }
         }
         sBuilder.append("]}");
-        System.out.println(sBuilder.toString());
         return sBuilder.toString();
     }
 
@@ -331,14 +349,16 @@ public class DatabaseConnector {
      */
     public static class PostTaskOutput{
         String ServerURLString;
-        byte[] JSONData;
+        String JSONDataString;
         String paylahID;
 
         public PostTaskOutput(String paylahID, FoodBatchOrder batchOrder){
             this.paylahID = paylahID;
             String ServerURLTail = String.format(Locale.US,"/make_order?plid=%s",paylahID);
             this.ServerURLString = SERVERURLSTRING + ServerURLTail;
-            this.JSONData = constructJSON(batchOrder).getBytes(StandardCharsets.UTF_8);
+            this.JSONDataString = constructJSON(batchOrder);
+            System.out.print("Server POST item:");
+            System.out.println(JSONDataString);
 
         }
     }
@@ -366,13 +386,35 @@ public class DatabaseConnector {
                 HttpURLConnection myConnection = (HttpURLConnection) serverURL.openConnection();
 
                 // Set request Headers
+                myConnection.setConnectTimeout(5000);//5 secs
+                myConnection.setReadTimeout(5000);//5 secs
                 myConnection.setRequestMethod("POST");
                 myConnection.setRequestProperty("User-Agent", paylahID);
-                myConnection.setRequestProperty( "charset", "utf-8");
+                myConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                myConnection.setDoOutput(true);
+                myConnection.setFixedLengthStreamingMode(postTaskOutput.JSONDataString.length());
 
                 // Write to server
+                /*
                 DataOutputStream wr = new DataOutputStream( myConnection.getOutputStream());
                 wr.write(postTaskOutput.JSONData);
+                */
+                // DEBUG
+                /*
+                System.out.println("Stream start");
+                OutputStream os = myConnection.getOutputStream();
+                os.write(postTaskOutput.JSONData);
+                os.close();
+                System.out.println("Stream end");
+                */
+                OutputStreamWriter out = new OutputStreamWriter(myConnection.getOutputStream());
+                out.write(postTaskOutput.JSONDataString);
+                out.flush();
+                out.close();
+                int res = myConnection.getResponseCode();
+                System.out.print("PostTask Server response code: ");
+                System.out.println(res);
+                myConnection.disconnect();
 
 
             } catch (IOException e){
@@ -390,5 +432,17 @@ public class DatabaseConnector {
                 delegate.postFinish(response);
             }
         }
+    }
+
+    private static String readConnectionInput(HttpURLConnection myConnection) throws IOException{
+        InputStreamReader responseBodyReader = new InputStreamReader(myConnection.getInputStream(), CHARSET);
+        StringBuilder stringBuilder = new StringBuilder();
+        String response;
+
+        BufferedReader bufferedReader = new BufferedReader(responseBodyReader);
+        while ((response = bufferedReader.readLine()) != null) {
+            stringBuilder.append(response);
+        }
+        return stringBuilder.toString();
     }
 }

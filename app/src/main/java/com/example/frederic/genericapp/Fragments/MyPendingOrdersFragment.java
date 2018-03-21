@@ -119,28 +119,26 @@ public class MyPendingOrdersFragment extends Fragment {
         // Iterate through current orders and add to table
         double totalPrice = 0.;
         String currency = "$";
+        MenuItem menuItem = null;
         ArrayList<Integer> displayedIDs = new ArrayList<>();
         for(FoodOrder foodOrder:pendingOrders.foodOrders){
             if (displayedIDs.contains(foodOrder.foodId)){
                 continue;
             }
-            MenuItem menuItem = menu.findItem(foodOrder.foodId);
+            menuItem = menu.findItem(foodOrder.foodId);
 
             insertMenuItemTableEntry(menuItem);
-            double itemPrice;
-            try{
-                itemPrice = Double.parseDouble(menuItem.price.split(" ")[1]);
-                currency = menuItem.price.split(" ")[0];
-            } catch (NumberFormatException e){
-                itemPrice = Double.parseDouble(menuItem.price.split(" ")[0]);
-                currency = menuItem.price.split(" ")[1];
-            }
-            totalPrice+=itemPrice*pendingOrders.getItemCount(foodOrder.foodId);
+            double itemPrice = menuItem.priceVal;
+
+            // Price Calculation is simplified as we do not know how special orders affect price yet
+            totalPrice += itemPrice*pendingOrders.getItemCount(foodOrder.foodId);
             displayedIDs.add(foodOrder.foodId);
         }
 
         // Set total price
-        totalPriceTextView.setText(String.format(Locale.US,"%s %.2f",currency,totalPrice));
+        if (menuItem!=null) {
+            totalPriceTextView.setText(menuItem.formatPrice(totalPrice));
+        }
 
     }
 

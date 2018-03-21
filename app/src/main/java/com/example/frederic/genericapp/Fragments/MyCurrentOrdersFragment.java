@@ -74,8 +74,6 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
     @Override
     public void onResume() {
         super.onResume();
-        //DEBUG
-        System.out.println("Resuming");
         // Delete all previously loaded items
         table.removeAllViews();
 
@@ -100,27 +98,25 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
 
         // Create rows for unfulfilled items first
         String currency = "$";
+        double itemPrice;
+        int foodId;
+        MenuItem menuItem = null;
 
         for(FoodStatus foodStatus:foodStatuses.statuses){
-            int foodId = foodStatus.food_id;
+            foodId = foodStatus.food_id;
             System.out.println(foodId);
-            MenuItem menuItem = menu.findItem(foodId);
+            menuItem = menu.findItem(foodId);
             insertMenuItemTableEntry(menuItem, foodStatus);
-            double itemPrice;
+            itemPrice = menuItem.priceVal;
 
-            try {
-                itemPrice = Double.parseDouble(menuItem.price.split(" ")[1]);
-                currency = menuItem.price.split(" ")[0];
-            } catch (NumberFormatException e) {
-                itemPrice = Double.parseDouble(menuItem.price.split(" ")[0]);
-                currency = menuItem.price.split(" ")[1];
-            }
-
+            // TODO: Simplification of price used as substitution for actual
             totalPrice += itemPrice * (foodStatus.delivered + foodStatus.pending);
         }
 
         // Set total price
-        totalPriceTextView.setText(String.format(Locale.US,"%s %.2f",currency,totalPrice));
+        if (menuItem != null) {
+            totalPriceTextView.setText(menuItem.formatPrice(totalPrice));
+        }
 
     }
     private void insertMenuItemTableEntry(MenuItem menuItem,FoodStatus foodStatus){

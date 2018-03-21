@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 /**
  * MenuItem is a data class to store information about each menu item
@@ -15,12 +16,38 @@ public class MenuItem implements Parcelable {
     public String name;
     public String description;
     public URL imageURL;
+    public double priceVal;
+    public String currency;
+    private boolean currencyAtStart;
+
     public MenuItem(int id, String price, String name,String description,URL imageURL){
         this.id = id;
         this.price = price;
         this.name = name;
         this.description = description;
         this.imageURL = imageURL;
+        try {
+            this.priceVal = Double.valueOf(price.split(" ")[1]);
+            this.currency = price.split(" ")[0];
+            this.currencyAtStart = true;
+        } catch (NumberFormatException e){
+            this.priceVal = Double.valueOf(price.split(" ")[0]);
+            this.currency = price.split(" ")[1];
+            this.currencyAtStart=false;
+        }
+    }
+
+    /**
+     * Formats a number into the relevant currency held by this item
+     * @param priceVal      Number to format
+     * @return              String with value, and currency
+     */
+    public String formatPrice(double priceVal){
+        if(currencyAtStart){
+            return String.format(Locale.US,"%s %.2f",currency,priceVal);
+        } else {
+            return String.format(Locale.US,"%.2f %s",priceVal,currency);
+        }
     }
 
     /**

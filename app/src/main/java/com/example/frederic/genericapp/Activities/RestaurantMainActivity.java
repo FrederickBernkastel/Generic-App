@@ -149,7 +149,7 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
             orderInput = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.EXISTINGORDERS);
         } catch (Exception e){
             System.out.println("Error parsing DatabaseConnector input in RestaurantMainActivity. Was the correct mode used?");
-            // Terminate this activity, and close entire app
+            // Terminate this activity
             this.finish();
             android.os.Process.killProcess(android.os.Process.myPid());
             return;

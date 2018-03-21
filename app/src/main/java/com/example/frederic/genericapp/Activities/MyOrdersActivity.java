@@ -32,6 +32,8 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
     private PagerAdapter adapter;
     private FoodBatchOrder pendingOrders;
 
+    private boolean layoutCreated;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +41,8 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
 
         // Extract plid
         String plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyOrdersActivity.this,String.class);
+
+        layoutCreated = false;
 
         // Get server data
         DatabaseConnector.FetchTaskInput input;
@@ -71,6 +75,7 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
         // Set listener to tab's layout onClick
         mTabLayout.addOnTabSelectedListener(MyOrdersActivity.this);
 
+        layoutCreated = true;
     }
 
     @Override
@@ -139,6 +144,21 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
 
     @Override
     public void fetchFinish(FetchedObject output) {
+        // TODO: Unable to connect to server, launch ErrorActivity
+        if (output==null){
+            return;
+        }
+        // Waits while layout fragments have not been created
+        while(!layoutCreated){
+            try {
+                wait();
+            } catch (InterruptedException e){
+                // This should not occur as threads are not notifying each other
+                System.out.println("An interrupted exception has occurred in MyOrdersActivity");
+                return;
+            }
+        }
+
         adapter.mCurrentOrdersFragment.fetchFinish(output);
     }
 }

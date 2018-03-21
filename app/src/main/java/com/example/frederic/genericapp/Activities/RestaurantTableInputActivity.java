@@ -47,13 +47,15 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
     private int tableNumber;
     private int peopleNumber;
 
-    private String randomPaylahId = "87425199";
+    private String plid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_table_input);
 
+        // Extract paylah id
+        plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),RestaurantTableInputActivity.this,String.class);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         TableFragment tableFragment = new TableFragment();
@@ -208,7 +210,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
                     try{
                         // To store data class
                         DatabaseConnector.FetchTaskInput fetchTaskInput =
-                                new DatabaseConnector.FetchTaskInput(randomPaylahId, tableNumber, DatabaseConnector.FetchMode.TABLENO);
+                                new DatabaseConnector.FetchTaskInput(plid, tableNumber, DatabaseConnector.FetchMode.TABLENO);
                         DatabaseConnector.FetchTask fetchTask= new DatabaseConnector.FetchTask(this);
                         fetchTask.execute(fetchTaskInput);
                     } catch (Exception e){
@@ -220,7 +222,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
                     try{
                     // To store data class
                     DatabaseConnector.FetchTaskInput fetchTaskInput =
-                            new DatabaseConnector.FetchTaskInput(randomPaylahId, tableNumber, peopleNumber, DatabaseConnector.FetchMode.PEOPLENO);
+                            new DatabaseConnector.FetchTaskInput(plid, tableNumber, peopleNumber, DatabaseConnector.FetchMode.PEOPLENO);
                     DatabaseConnector.FetchTask fetchTask= new DatabaseConnector.FetchTask(this);
                     fetchTask.execute(fetchTaskInput);
                 } catch (Exception e){
@@ -247,7 +249,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
         currState = FetchState.ISMENU;
         try{
             DatabaseConnector.FetchTaskInput fetchTaskInput =
-                    new DatabaseConnector.FetchTaskInput(randomPaylahId, tableNumber, DatabaseConnector.FetchMode.MENU);
+                    new DatabaseConnector.FetchTaskInput(plid, tableNumber, DatabaseConnector.FetchMode.MENU);
             DatabaseConnector.FetchTask fetchTask= new DatabaseConnector.FetchTask(this);
             fetchTask.execute(fetchTaskInput);
         }
@@ -262,6 +264,17 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
     @Override
     public void fetchFinish(FetchedObject output) {
         if (output==null){
+            // TODO: REMOVE THIS
+            // Closes any session, if previously open
+            try {
+                DatabaseConnector.FetchTaskInput input = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.DELETESESSION);
+                new DatabaseConnector.FetchTask(null).execute(input).get();
+            } catch (Exception e){
+
+            }
+
+
+            // END OF REMOVE THIS
             // TODO: Server failed to respond, launch ErrorActivity
             return;
         }
