@@ -26,8 +26,6 @@ public class PeopleFragment extends Fragment {
 
     private final int NUMOFDIGITS = 2;
     public static ArrayList<TextView> textViewList;
-    private int textViewListPtr = 0;
-    FragmentActivity listener;
 
 
     @Nullable

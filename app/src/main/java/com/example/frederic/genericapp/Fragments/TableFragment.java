@@ -25,8 +25,7 @@ public class TableFragment extends Fragment {
 
     private final int NUMOFDIGITS = 6;
     public static ArrayList<TextView> textViewList;
-    private int textViewListPtr=0;
-    FragmentActivity listener;
+
 
 
 
