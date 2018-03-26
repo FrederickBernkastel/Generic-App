@@ -5,13 +5,16 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.GridLayout;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.frederic.genericapp.Data.AsyncFetchResponse;
@@ -53,6 +56,7 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
         // Fetch order status from server
         String plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyBillActivity.this,String.class);
 
+        /*
         // TODO: INSERT RESTAURANT MENU FOR DEBUGGING, DELETE WHEN DONE
         JSONArray array = new JSONArray();
         JSONObject json=new JSONObject();
@@ -108,12 +112,15 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
             foodStatuses.addStatus(999, true);
             foodStatuses.addStatus(999, true);
             foodStatuses.addStatus(1002, true);
+            foodStatuses.addStatus(1001, true);
+            foodStatuses.addStatus(1003, true);
+            foodStatuses.addStatus(1000, true);
 
         } catch(Exception e){
             System.out.println("Debug failure");
         }
         refreshExistingOrders(foodStatuses);
-        // END OF DEBUG
+        // END OF DEBUG*/
         try {
             DatabaseConnector.FetchTaskInput input = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.EXISTINGORDERS);
             new DatabaseConnector.FetchTask(MyBillActivity.this).execute(input);
@@ -138,6 +145,7 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
 
     @Override
     public void fetchFinish(FetchedObject output) {
+
         if (output==null){
             // TODO: Error connecting to server, send to ErrorActivity
             return;
@@ -174,7 +182,7 @@ class GridAdapter extends BaseAdapter{
     // Stores last MenuItem in order to access its Price Formatting methods
     private MenuItem lastMenuItem;
 
-    // TODO: REDO ADAPTER TO INFLATE A XML ROW
+
     GridAdapter(Context context, FoodStatuses foodStatuses,RestaurantMenu menu){
         // Init
         gridValues = new String[3+foodStatuses.statuses.size()*3];
@@ -215,29 +223,31 @@ class GridAdapter extends BaseAdapter{
 
         // Check if view already exists
         if (view == null) {
-            TextView textView = new TextView(context);
-            textView.setText(gridValues[i]);
-            textView.setPadding(20,0,20,0);
+            // Inflate new xml file, and
+            LayoutInflater  inflater = LayoutInflater.from(context);
+            View row = inflater.inflate(R.layout.row_my_bill_activity,null);
+            TextView nameTextView = row.findViewById(R.id.row_my_bill_activity_name);
+            TextView quantityTextView = row.findViewById(R.id.row_my_bill_activity_qty);
+            TextView priceTextView = row.findViewById(R.id.row_my_bill_activity_price);
+
+            // Set text
+            nameTextView.setText(gridValues[i*3]);
+            quantityTextView.setText(gridValues[i*3+1]);
+            priceTextView.setText(gridValues[i*3+2]);
 
             // Check if headers
-            if (i<3){
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,30);
-            } else {
-                // Check if item name
-                if (i%3==0) {
-                    textView.setSingleLine(false);
+            if (i==0){
+                nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,30);
+                quantityTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,30);
+                priceTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,30);
 
-                }
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
-                if(i%3==0){
-                    textView.setTextColor(Color.parseColor("#000000"));
-                }
+                quantityTextView.setTextColor(Color.parseColor("#000000"));
+                priceTextView.setTextColor(Color.parseColor("#000000"));
+
             }
 
 
-
-
-            return textView;
+            return row;
 
 
         } else {
@@ -259,10 +269,13 @@ class GridAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return gridValues.length;
+        return gridValues.length/3;
     }
 
     public String getTotalPrice(){
+        if (totalPrice==null||lastMenuItem==null){
+            return "";
+        }
         return lastMenuItem.formatPrice(totalPrice);
     }
 }
