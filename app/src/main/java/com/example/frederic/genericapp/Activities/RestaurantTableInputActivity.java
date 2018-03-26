@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.frederic.genericapp.Data.AsyncFetchResponse;
 import com.example.frederic.genericapp.Data.DatabaseConnector;
@@ -36,6 +37,10 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
     private ArrayList<TextView> textViewList;
     private int textViewListPtr=0;
     public static ArrayList<TextView> viewList;
+    private int tableNumber;
+    private int peopleNumber;
+    private String randomPaylahId = "87425199";
+
     enum FetchState{
         ISPEOPLE,
         ISTABLE,
@@ -43,19 +48,11 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
     }
     FetchState currState;
 
-
-    private int tableNumber;
-    private int peopleNumber;
-
-    private String plid;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_table_input);
 
-        // Extract paylah id
-        plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),RestaurantTableInputActivity.this,String.class);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         TableFragment tableFragment = new TableFragment();
@@ -87,7 +84,8 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
         // Dynamically create buttons 1-9
         GridLayout grid = findViewById(R.id.grid);
 
-        int gridSize = (height/7 < width/4)? height/7: width/4;
+        int gridSize = (height/10 < width/6)? height/10: width/7;
+
 
         //Drawable newDrawing = ImageResize.pullImageFromDatabase("https://images-na.ssl-images-amazon.com/images/I/71m2NvJyIVL.png");
         // Resizing of image and putting it into imageview
@@ -201,6 +199,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
 
             if ( numbah == 0 && currState == FetchState.ISPEOPLE){
                 // TODO: add toast
+                Toast.makeText(this, "Please type in a valid number", Toast.LENGTH_LONG);
                 return;
             }
             // TODO: Use DatabaseConnector.FetchTask with FetchTaskInput.FetchMode = TABLENO and PEOPLENO
@@ -210,7 +209,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
                     try{
                         // To store data class
                         DatabaseConnector.FetchTaskInput fetchTaskInput =
-                                new DatabaseConnector.FetchTaskInput(plid, tableNumber, DatabaseConnector.FetchMode.TABLENO);
+                                new DatabaseConnector.FetchTaskInput(randomPaylahId, tableNumber, DatabaseConnector.FetchMode.TABLENO);
                         DatabaseConnector.FetchTask fetchTask= new DatabaseConnector.FetchTask(this);
                         fetchTask.execute(fetchTaskInput);
                     } catch (Exception e){
@@ -220,15 +219,15 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
                 case ISPEOPLE:
                     peopleNumber = numbah;
                     try{
-                    // To store data class
-                    DatabaseConnector.FetchTaskInput fetchTaskInput =
-                            new DatabaseConnector.FetchTaskInput(plid, tableNumber, peopleNumber, DatabaseConnector.FetchMode.PEOPLENO);
-                    DatabaseConnector.FetchTask fetchTask= new DatabaseConnector.FetchTask(this);
-                    fetchTask.execute(fetchTaskInput);
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
-                break;
+                        // To store data class
+                        DatabaseConnector.FetchTaskInput fetchTaskInput =
+                                new DatabaseConnector.FetchTaskInput(randomPaylahId, tableNumber, peopleNumber, DatabaseConnector.FetchMode.PEOPLENO);
+                        DatabaseConnector.FetchTask fetchTask= new DatabaseConnector.FetchTask(this);
+                        fetchTask.execute(fetchTaskInput);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    break;
 
                 case ISMENU:
                     break;
@@ -249,7 +248,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
         currState = FetchState.ISMENU;
         try{
             DatabaseConnector.FetchTaskInput fetchTaskInput =
-                    new DatabaseConnector.FetchTaskInput(plid, tableNumber, DatabaseConnector.FetchMode.MENU);
+                    new DatabaseConnector.FetchTaskInput(randomPaylahId, tableNumber, DatabaseConnector.FetchMode.MENU);
             DatabaseConnector.FetchTask fetchTask= new DatabaseConnector.FetchTask(this);
             fetchTask.execute(fetchTaskInput);
         }
@@ -264,17 +263,6 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
     @Override
     public void fetchFinish(FetchedObject output) {
         if (output==null){
-            // TODO: REMOVE THIS
-            // Closes any session, if previously open
-            try {
-                DatabaseConnector.FetchTaskInput input = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.DELETESESSION);
-                new DatabaseConnector.FetchTask(null).execute(input).get();
-            } catch (Exception e){
-
-            }
-
-
-            // END OF REMOVE THIS
             // TODO: Server failed to respond, launch ErrorActivity
             return;
         }
@@ -282,7 +270,8 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
             case TABLENO:
                 TableNumResponse tableNumResponse = (TableNumResponse) output;
                 if (tableNumResponse.isInvalidTableNum) {
-                    // TODO: add toast
+                    // TODO: add toast (to be checked)
+                    Toast.makeText(this, "Invalid Table Number", Toast.LENGTH_LONG);
                     return;
                 }
                 // Save valid table number
@@ -325,4 +314,5 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
 
     }
 }
+
 
