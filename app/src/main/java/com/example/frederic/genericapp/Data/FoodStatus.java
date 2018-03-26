@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
  */
 
 public class FoodStatus implements Comparable<FoodStatus>{
-    public int food_id;
+    public final int food_id;
     public int delivered;
     public int pending;
 

@@ -102,6 +102,7 @@ public class DatabaseConnector {
             }
             return menu;
         } catch (JSONException e){
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
 

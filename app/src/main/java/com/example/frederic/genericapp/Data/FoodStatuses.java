@@ -15,10 +15,11 @@ import java.util.Collections;
  */
 
 public class FoodStatuses extends FetchedObject{
-    public ArrayList<Integer> foodIDs;
-    public ArrayList<FoodStatus> statuses;
-    private SparseArray<FoodStatus> statusesSparse;
-    public boolean allFulfilled;
+    public final ArrayList<Integer> foodIDs;
+    public final ArrayList<FoodStatus> statuses;
+    private final SparseArray<FoodStatus> statusesSparse;
+    private boolean allFulfilled;
+
 
     public FoodStatuses(){
         statuses = new ArrayList<>();
@@ -57,4 +58,10 @@ public class FoodStatuses extends FetchedObject{
     public FoodStatus getStatus(int foodid){
         return statusesSparse.get(foodid);
     }
+
+    public boolean isAllFulfilled(){
+        return allFulfilled;
+    }
+
+    // TODO: Implement function to record total price of individual orders when server team catches up
 }

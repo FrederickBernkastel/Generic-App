@@ -7,13 +7,18 @@
     android:orientation="vertical"
     tools:context="com.example.frederic.genericapp.Activities.MyBillActivity">
 
+
     <GridView
         android:id="@+id/my_bill_activity_grid"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+
+        android:numColumns="3"
+        android:scrollbars="vertical">
 
     </GridView>
+
 
 
     <LinearLayout
@@ -50,7 +55,7 @@
 
             android:src="@drawable/activity_my_bill__icon_payment"
             app:backgroundTint="#FFFFFF"
-
+            android:onClick="onBillingRequestPress"
 
             />
     </LinearLayout>

@@ -96,10 +96,11 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
     public void onGuestButtonClick(View v){
         /*
         // DEBUG PORTION
-        Intent intentDebug = new Intent(MainActivity.this, RestaurantMainActivity.class);
+        Intent intentDebug = new Intent(MainActivity.this, MyBillActivity.class);
         startActivity(intentDebug);
         // END OF DEBUG PORTION
         */
+
         Intent intent = new Intent(MainActivity.this, RestaurantTableInputActivity.class);
         startActivity(intent);
     }
@@ -143,6 +144,7 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
             // Server indicates that there are unpaid bills, launch restaurant menu
             Intent intent = new Intent(MainActivity.this, RestaurantMainActivity.class);
             startActivity(intent);
+
         }
     }
 }
