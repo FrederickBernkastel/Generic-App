@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
 
-    tools:context="com.example.frederic.genericapp.Activities.ErrorActivity">
+    tools:context="com.example.frederic.genericapp.activities.ErrorActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

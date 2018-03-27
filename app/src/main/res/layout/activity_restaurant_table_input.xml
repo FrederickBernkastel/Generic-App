@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/activity_main__background_2"
-    tools:context="com.example.frederic.genericapp.Activities.RestaurantTableInputActivity">
+    tools:context="com.example.frederic.genericapp.activities.RestaurantTableInputActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

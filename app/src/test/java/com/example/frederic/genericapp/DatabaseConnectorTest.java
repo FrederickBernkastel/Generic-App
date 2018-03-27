@@ -1,10 +1,10 @@
 package com.example.frederic.genericapp;
 
-import com.example.frederic.genericapp.Data.AsyncFetchResponse;
-import com.example.frederic.genericapp.Data.DatabaseConnector;
-import com.example.frederic.genericapp.Data.FetchedObject;
-import com.example.frederic.genericapp.Data.MenuItem;
-import com.example.frederic.genericapp.Data.RestaurantMenu;
+import com.example.frederic.genericapp.data.AsyncFetchResponse;
+import com.example.frederic.genericapp.data.DatabaseConnector;
+import com.example.frederic.genericapp.data.FetchedObject;
+import com.example.frederic.genericapp.data.MenuItem;
+import com.example.frederic.genericapp.data.RestaurantMenu;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,8 +41,8 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
         json.put("menu",array);
         s = json.toString();
 
-        DatabaseConnector dc = new DatabaseConnector();
-        RestaurantMenu menu = dc.parseJSONMenu(s);
+
+        RestaurantMenu menu = DatabaseConnector.parseJSONMenu(s);
         MenuItem item = menu.menu.get(0);
         assertEquals("Ugandan Cuisine",menu.name);
         assertEquals(new URL("https://www.link1.com"),menu.imageURL);

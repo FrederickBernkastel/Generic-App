@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.frederic.genericapp.Fragments.MyCurrentOrdersFragment">
+    tools:context="com.example.frederic.genericapp.fragments.MyCurrentOrdersFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -15,7 +15,7 @@
             android:layout_height="wrap_content">
 
         </TableLayout>
-    </ScrollView>>
+    </ScrollView>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,7 +25,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:paddingLeft="20sp"
+            android:paddingStart="20sp"
+            android:paddingEnd="20sp"
 
             android:text="@string/price_total"
             android:textSize="30sp"
@@ -36,11 +37,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:paddingRight="20sp"
+            android:layout_toEndOf="@+id/current_orders_fragment_price_label"
+            android:paddingStart="20sp"
+            android:paddingEnd="20sp"
 
 
             android:textSize="30sp"
             android:textColor="#000000"
+            android:textAlignment="textEnd"
             />
     </RelativeLayout>
     <Button

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.frederic.genericapp.Activities.RestaurantMainActivity">
+    tools:context="com.example.frederic.genericapp.activities.RestaurantMainActivity">
 
     <TextView
         android:id="@+id/header_title"
