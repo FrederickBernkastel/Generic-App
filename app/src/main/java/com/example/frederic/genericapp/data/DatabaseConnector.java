@@ -38,7 +38,8 @@ public class DatabaseConnector {
         TABLENO,
         PEOPLENO,
         EXISTINGORDERS,
-        DELETESESSION
+        DELETESESSION,
+        STRIPEPAYMENT
     }
 
 
@@ -165,12 +166,26 @@ public class DatabaseConnector {
                 JSONObject item = jsonStatuses.getJSONObject(i);
                 int id = item.getInt("food_id");
                 boolean delivered = item.getBoolean("delivered");
-                foodStatuses.addStatus(id,delivered);
+                double price = item.getDouble("price");
+                price += item.getDouble("additional_price");
+                foodStatuses.addStatus(id,delivered,price);
             }
             return foodStatuses;
         } catch (JSONException e){
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Parse server response to transaction POST with stripe
+     */
+    private static FetchedObject parseStripeTransactionResponse(String s){
+
+        switch (s){
+            case "Payment Success":
+                return new TransactionStatus(true);
+        }
+        return null;
     }
 
 
@@ -228,8 +243,22 @@ public class DatabaseConnector {
             }
             this.ServerURLString = SERVERURLSTRING + ServerURLTail;
         }
+        public FetchTaskInput(String paylahID,String stripeTokenID,FetchMode fetchMode) throws Exception {
+            this.paylahID = paylahID;
+            this.fetchMode = fetchMode;
+            String ServerURLTail;
+            switch (fetchMode) {
+                case STRIPEPAYMENT:
+                    ServerURLTail = String.format(Locale.US, "/make_payment?plid=%s&token_id=%s", paylahID, stripeTokenID);
+                    break;
+                default:
+                    throw new Exception("Invalid FetchTaskInput parameters");
+            }
+            this.ServerURLString = SERVERURLSTRING + ServerURLTail;
+        }
 
     }
+
 
 
     /**
@@ -290,7 +319,10 @@ public class DatabaseConnector {
                                 fetchedObject = parseFoodStatusResponse(response);
                                 break;
                             case DELETESESSION:
-                                return null;
+                                break;
+                            case STRIPEPAYMENT:
+                                fetchedObject = parseStripeTransactionResponse(response);
+                                break;
 
                         }
                         fetchedObject.fetchMode = fetchTaskInput.fetchMode;

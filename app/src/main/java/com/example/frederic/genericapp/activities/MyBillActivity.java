@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.frederic.genericapp.data.AsyncFetchResponse;
 import com.example.frederic.genericapp.data.DatabaseConnector;
@@ -25,6 +26,7 @@ import com.example.frederic.genericapp.data.MenuItem;
 import com.example.frederic.genericapp.data.RestaurantMenu;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
+import com.example.frederic.genericapp.data.TransactionStatus;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.identity.intents.model.UserAddress;
@@ -53,6 +55,7 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
     private boolean allowBilling;
     private PaymentsClient paymentsClient;
     private final int LOAD_PAYMENT_DATA_REQUEST_CODE = 1;
+    private String plid;
 
 
     @Override
@@ -78,7 +81,7 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
         allowBilling = false;
 
         // Fetch order status from server
-        String plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyBillActivity.this,String.class);
+        plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyBillActivity.this,String.class);
 
         /*
         // TODO: INSERT RESTAURANT MENU FOR DEBUGGING, DELETE WHEN DONE
@@ -182,8 +185,16 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
                 FoodStatuses foodStatuses = (FoodStatuses) output;
                 // Inform user that not all orders have been fulfilled with a DialogFragment
                 if (! foodStatuses.isAllFulfilled()){
-                    onBackPressed();
-                    displayCannotBillAlert();
+                    displayBillDeniedAlert();
+                    /*
+                    // DEBUG ONLY
+                    for(FoodStatus f:foodStatuses.statuses){
+                        f.delivered += f.pending;
+                        f.pending = 0;
+                    }
+
+                    // END OF DEBUG ONLY
+                    */
                 } else {
                     // Allow billing
                     allowBilling = true;
@@ -192,13 +203,29 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
                     refreshExistingOrders(foodStatuses);
                 }
                 break;
+            case STRIPEPAYMENT:
+                TransactionStatus transactionStatus = (TransactionStatus) output;
+                if (transactionStatus.success){
+                    Toast.makeText(MyBillActivity.this,"Transaction Success",Toast.LENGTH_LONG).show();
+                    // Go back to the MainActivity
+                    Intent intent = new Intent(MyBillActivity.this,MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    displayBillFailedAlert();
+                }
+                break;
         }
     }
 
-    // TODO: Handle billing
+    // Handle billing
     public void onBillingRequestPress(View v){
         // Check if a fetch has been done
         if(allowBilling){
+            // DEBUG / TESTING
+            chargeToken("TestID");
+            // Remove block for live
+            /*
             PaymentDataRequest request = createPaymentDataRequest();
             if (request != null) {
                 AutoResolveHelper.resolveTask(
@@ -208,6 +235,7 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
                 // LOAD_PAYMENT_DATA_REQUEST_CODE is a constant integer of your choice,
                 // similar to what you would use in startActivityForResult
             }
+            */
         }
     }
 
@@ -301,7 +329,6 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
                         if (stripeToken != null) {
                             // This chargeToken function is a call to your own server, which should then connect
                             // to Stripe's API to finish the charge.
-                            System.out.println(stripeToken.getId());
                             chargeToken(stripeToken.getId());
                         }
                         break;
@@ -324,24 +351,54 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
         }
     }
 
-    private void chargeToken(String tokenID){
-        // TODO: Send tokenID to server
-    }
     /**
-     * Creates a DialogFragment to inform the user that Billing is not possible
+     * Passes tokenID to server
      */
-    public void displayCannotBillAlert(){
+    private void chargeToken(String tokenID){
+        // Send tokenID to server
+        DatabaseConnector.FetchTaskInput input;
+        try {
+            input = new DatabaseConnector.FetchTaskInput(plid,tokenID,DatabaseConnector.FetchMode.STRIPEPAYMENT);
+        } catch (Exception e) {
+            System.out.println("Invalid FetchTaskInput parameters in MyBillActivity");
+            return;
+        }
+        new DatabaseConnector.FetchTask(MyBillActivity.this).execute(input);
+    }
+
+    /**
+     * Creates a DialogFragment to inform the user that Billing is denied
+     */
+    public void displayBillDeniedAlert(){
         AlertDialog alertDialog = new AlertDialog.Builder(MyBillActivity.this).create();
         alertDialog.setTitle(getString(R.string.alert_billing_denied_title));
         alertDialog.setMessage(getString(R.string.alert_billing_denied_pending_orders));
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.alert_billing_denied_ok),
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+                        onBackPressed();
                     }
                 });
         alertDialog.show();
     }
+    /**
+     * Creates a DialogFragment to inform the user that Billing is not possible
+     */
+    public void displayBillFailedAlert(){
+        AlertDialog alertDialog = new AlertDialog.Builder(MyBillActivity.this).create();
+        alertDialog.setTitle(getString(R.string.alert_billing_failed_title));
+        alertDialog.setMessage(getString(R.string.alert_billing_failed_description));
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        onBackPressed();
+                    }
+                });
+        alertDialog.show();
+    }
+    
 }
 
 /**

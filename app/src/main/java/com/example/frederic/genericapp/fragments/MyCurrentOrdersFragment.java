@@ -1,6 +1,7 @@
 package com.example.frederic.genericapp.fragments;
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.example.frederic.genericapp.activities.ErrorActivity;
 import com.example.frederic.genericapp.data.AsyncFetchResponse;
 import com.example.frederic.genericapp.data.FetchedObject;
 import com.example.frederic.genericapp.data.FoodStatus;
@@ -103,9 +105,9 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
             System.out.println(foodId);
             menuItem = menu.findItem(foodId);
             insertMenuItemTableEntry(menuItem, foodStatus);
-            itemPrice = menuItem.priceVal;
+            itemPrice = foodStatus.totalPrice;
 
-            // TODO: Simplification of price used as substitution for actual
+            // Sums up total price
             totalPrice += itemPrice * (foodStatus.delivered + foodStatus.pending);
         }
 
@@ -127,7 +129,7 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
         itemNameTextView.setText(menuItem.name);
         itemNameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
         itemNameTextView.setTextColor(Color.parseColor("#000000"));
-        itemFulfilledTextView.setText(String.format(Locale.US,"%d / %d",foodStatus.pending,foodStatus.pending+foodStatus.delivered));
+        itemFulfilledTextView.setText(String.format(Locale.US,"%d / %d",foodStatus.delivered,foodStatus.pending+foodStatus.delivered));
         itemFulfilledTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
         itemFulfilledTextView.setTextColor(Color.parseColor("#000000"));
 
@@ -162,9 +164,12 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
     @Override
     public void fetchFinish(FetchedObject output) {
 
-        // TODO: Launch ErrorActivity
+        // Launch ErrorActivity
         if (output==null){
             System.out.println("Error connecting to server in CurrentOrdersFragment");
+            Intent intent = new Intent(getContext(), ErrorActivity.class);
+            startActivity(intent);
+
             return;
         }
         // Store data

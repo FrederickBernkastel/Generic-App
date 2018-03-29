@@ -27,8 +27,14 @@
     <string name="alert_billing_denied_pending_orders">
         Billing is denied because there are still undelivered items.\n
         Please contact staff if you want to be billed regardless.
-    </string>>
-    <string name="alert_billing_denied_ok">OK</string>>
+    </string>
+    <string name="ok">OK</string>>
+    <string name="alert_billing_failed_title">Payment Failed</string>
+    <string name="alert_billing_failed_description">
+        Billing has failed for unspecified reasons.\n
+        Staff has been notified and will be with you shortly.\n\n
+        We apologize for the inconvenience.
+    </string>
 
     <string name="credits">
         Chef icon made by Monkik from flaticon.com\n

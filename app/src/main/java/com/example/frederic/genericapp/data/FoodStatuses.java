@@ -31,7 +31,7 @@ public class FoodStatuses extends FetchedObject{
      * @param id            food_id of new status
      * @param delivered     New status of single food item
      */
-    public void addStatus(int id,boolean delivered){
+    public void addStatus(int id,boolean delivered, double price){
         FoodStatus foodStatus = statusesSparse.get(id);
 
         if (foodStatus == null){
@@ -43,6 +43,7 @@ public class FoodStatuses extends FetchedObject{
             allFulfilled = false;
         }
         foodStatus.appendStatus(delivered);
+        foodStatus.addPrice(price);
         statusesSparse.append(id,foodStatus);
     }
 
