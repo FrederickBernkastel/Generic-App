@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,25 @@ import com.example.frederic.genericapp.data.MenuItem;
 import com.example.frederic.genericapp.data.RestaurantMenu;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.identity.intents.model.UserAddress;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wallet.AutoResolveHelper;
+import com.google.android.gms.wallet.CardInfo;
+import com.google.android.gms.wallet.CardRequirements;
+import com.google.android.gms.wallet.IsReadyToPayRequest;
+import com.google.android.gms.wallet.PaymentData;
+import com.google.android.gms.wallet.PaymentDataRequest;
+import com.google.android.gms.wallet.PaymentMethodTokenizationParameters;
+import com.google.android.gms.wallet.PaymentsClient;
+import com.google.android.gms.wallet.TransactionInfo;
+import com.google.android.gms.wallet.Wallet;
+import com.google.android.gms.wallet.WalletConstants;
+import com.stripe.android.model.Token;
+
+import java.util.Arrays;
 
 
 public class MyBillActivity extends Activity implements AsyncFetchResponse{
@@ -31,7 +51,8 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
     private GridView gridView;
     private TextView totalPrice;
     private boolean allowBilling;
-
+    private PaymentsClient paymentsClient;
+    private final int LOAD_PAYMENT_DATA_REQUEST_CODE = 1;
 
 
     @Override
@@ -41,6 +62,10 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
 
         gridView = findViewById(R.id.my_bill_activity_grid);
         totalPrice = findViewById(R.id.my_bill_activity_price);
+
+         paymentsClient = Wallet.getPaymentsClient(this,
+                            new Wallet.WalletOptions.Builder().setEnvironment(WalletConstants.ENVIRONMENT_TEST)
+                                .build());
 
 
     }
@@ -174,9 +199,137 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
     public void onBillingRequestPress(View v){
         // Check if a fetch has been done
         if(allowBilling){
-
+            PaymentDataRequest request = createPaymentDataRequest();
+            if (request != null) {
+                AutoResolveHelper.resolveTask(
+                        paymentsClient.loadPaymentData(request),
+                        this,
+                        LOAD_PAYMENT_DATA_REQUEST_CODE);
+                // LOAD_PAYMENT_DATA_REQUEST_CODE is a constant integer of your choice,
+                // similar to what you would use in startActivityForResult
+            }
         }
     }
+
+    /**
+     * Stripe fuction to see whether or not to display Google Pay as an option.
+     */
+    private void isReadyToPay() {
+        IsReadyToPayRequest request = IsReadyToPayRequest.newBuilder()
+                .addAllowedPaymentMethod(WalletConstants.PAYMENT_METHOD_CARD)
+                .addAllowedPaymentMethod(WalletConstants.PAYMENT_METHOD_TOKENIZED_CARD)
+                .build();
+        Task<Boolean> task = paymentsClient.isReadyToPay(request);
+        task.addOnCompleteListener(
+                new OnCompleteListener<Boolean>() {
+                    public void onComplete(Task<Boolean> task) {
+                        try {
+                            boolean result =
+                                    task.getResult(ApiException.class);
+                            if(result) {
+                                //show Google as payment option
+                            } else {
+                                //hide Google as payment option
+                            }
+                        } catch (ApiException exception) { }
+                    }
+                });
+    }
+
+    /**
+     * Provides the necessary information to support a payment.
+     * @return PaymentMethodTokenizationParameters representing a request for methods of payment (such as a credit card) and other details.
+     */
+    private PaymentMethodTokenizationParameters createTokenizationParameters() {
+        return PaymentMethodTokenizationParameters.newBuilder()
+                .setPaymentMethodTokenizationType(WalletConstants.PAYMENT_METHOD_TOKENIZATION_TYPE_PAYMENT_GATEWAY)
+                .addParameter("gateway", "stripe")
+                .addParameter("stripe:publishableKey", "pk_test_ch1GxUFVpWN0R0TljLM5aM1a")
+                .addParameter("stripe:version", "5.1.0")
+                .build();
+    }
+
+    /**
+     * Procides necessary information regarding a transaction
+     * @return PaymentDataRequest object with the information relevant to the purchase.
+     */
+    private PaymentDataRequest createPaymentDataRequest() {
+        // TODO: Set Currency Code and Price
+        PaymentDataRequest.Builder request =
+                PaymentDataRequest.newBuilder()
+                        .setTransactionInfo(
+                                TransactionInfo.newBuilder()
+                                        .setTotalPriceStatus(WalletConstants.TOTAL_PRICE_STATUS_FINAL)
+                                        .setTotalPrice("10.00")
+                                        .setCurrencyCode("USD")
+                                        .build())
+                        .addAllowedPaymentMethod(WalletConstants.PAYMENT_METHOD_CARD)
+                        .addAllowedPaymentMethod(WalletConstants.PAYMENT_METHOD_TOKENIZED_CARD)
+                        .setCardRequirements(
+                                CardRequirements.newBuilder()
+                                        .addAllowedCardNetworks(Arrays.asList(
+                                                WalletConstants.CARD_NETWORK_AMEX,
+                                                WalletConstants.CARD_NETWORK_DISCOVER,
+                                                WalletConstants.CARD_NETWORK_VISA,
+                                                WalletConstants.CARD_NETWORK_MASTERCARD))
+                                        .build());
+
+        request.setPaymentMethodTokenizationParameters(createTokenizationParameters());
+        return request.build();
+    }
+
+
+    /**
+     * Handles result of launching Google Pay
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case LOAD_PAYMENT_DATA_REQUEST_CODE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        PaymentData paymentData = PaymentData.getFromIntent(data);
+                        // You can get some data on the user's card, such as the brand and last 4 digits
+                        CardInfo info = paymentData.getCardInfo();
+                        // You can also pull the user address from the PaymentData object.
+                        UserAddress address = paymentData.getShippingAddress();
+                        // This is the raw JSON string version of your Stripe token.
+                        String rawToken = paymentData.getPaymentMethodToken().getToken();
+
+                        // Now that you have a Stripe token object, charge that by using the id
+                        Token stripeToken = Token.fromString(rawToken);
+                        if (stripeToken != null) {
+                            // This chargeToken function is a call to your own server, which should then connect
+                            // to Stripe's API to finish the charge.
+                            System.out.println(stripeToken.getId());
+                            chargeToken(stripeToken.getId());
+                        }
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        break;
+                    case AutoResolveHelper.RESULT_ERROR:
+                        Status status = AutoResolveHelper.getStatusFromIntent(data);
+                        // Log the status for debugging
+                        Log.e("GooglePay Error",status.getStatusMessage());
+                        // Generally there is no need to show an error to
+                        // the user as the Google Payment API will do that
+                        break;
+                    default:
+                        // Do nothing.
+                }
+                break; // Breaks the case LOAD_PAYMENT_DATA_REQUEST_CODE
+            // Handle any other startActivityForResult calls you may have made.
+            default:
+                // Do nothing.
+        }
+    }
+
+    private void chargeToken(String tokenID){
+        // TODO: Send tokenID to server
+    }
+    /**
+     * Creates a DialogFragment to inform the user that Billing is not possible
+     */
     public void displayCannotBillAlert(){
         AlertDialog alertDialog = new AlertDialog.Builder(MyBillActivity.this).create();
         alertDialog.setTitle(getString(R.string.alert_billing_denied_title));
@@ -191,6 +344,9 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
     }
 }
 
+/**
+ * Adapter used to display ordered items dynamically in rows
+ */
 class GridAdapter extends BaseAdapter{
     private Context context;
     private String[] gridValues;
@@ -293,7 +449,11 @@ class GridAdapter extends BaseAdapter{
         return gridValues.length/3;
     }
 
-    public String getTotalPrice(){
+    /**
+     * Function to extract the total price of all items, formatted to local currency
+     * @return
+     */
+    String getTotalPrice(){
         if (totalPrice==null||lastMenuItem==null){
             return "";
         }

@@ -82,6 +82,7 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
 
         }
 
+
         // Check for unpaid bills
         DatabaseConnector.FetchTaskInput input;
         try {
@@ -129,8 +130,6 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
                         Intent intent = new Intent(MainActivity.this, ErrorActivity.class);
                         startActivity(intent);
                         ErrorActivity.errorType = ErrorActivity.ErrorType.INVALIDPHONENUMBER;
-
-
 
 
                     }

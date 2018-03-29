@@ -11,9 +11,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -26,7 +29,7 @@ import java.util.Locale;
  */
 public class DatabaseConnector {
 
-    private static final String SERVERURLSTRING = "http://10.12.79.231:4995/api";
+    private static final String SERVERURLSTRING = "https://crookedcooks.herokuapp.com/api";
     private static final String CHARSET = "UTF-8";
     private static final int NUMOFCONNATTEMPTS = 3;
 
@@ -201,7 +204,7 @@ public class DatabaseConnector {
             String ServerURLTail;
             switch(fetchMode){
                 case PEOPLENO:
-                    ServerURLTail = String.format(Locale.US,"/register?table_number=%d&plid=%s&numpeople=%d",tableNumber,paylahID,peopleNumber);
+                    ServerURLTail = String.format(Locale.US,"/register?table_number=%d&plid=%s&num_people=%d",tableNumber,paylahID,peopleNumber);
                     break;
                 default:
                     throw new Exception("Invalid FetchTaskInput parameters");
@@ -260,6 +263,8 @@ public class DatabaseConnector {
                     HttpURLConnection myConnection = (HttpURLConnection) serverURL.openConnection();
 
                     // Set request Headers
+                    myConnection.setConnectTimeout(10000);
+                    myConnection.setReadTimeout(10000);
                     myConnection.setRequestMethod("GET");
                     myConnection.setRequestProperty("User-Agent", paylahID);
 
@@ -289,6 +294,7 @@ public class DatabaseConnector {
 
                         }
                         fetchedObject.fetchMode = fetchTaskInput.fetchMode;
+                        myConnection.disconnect();
                         return fetchedObject;
 
                     } else {
@@ -373,7 +379,8 @@ public class DatabaseConnector {
         protected Integer doInBackground(PostTaskOutput... params) {
             PostTaskOutput postTaskOutput = params[0];
             String paylahID = postTaskOutput.paylahID;
-
+            System.out.print("Connecting to: ");
+            System.out.println(postTaskOutput.ServerURLString);
             try {
                 // Create URL
                 URL serverURL = new URL(postTaskOutput.ServerURLString);
@@ -382,13 +389,17 @@ public class DatabaseConnector {
                 HttpURLConnection myConnection = (HttpURLConnection) serverURL.openConnection();
 
                 // Set request Headers
-                myConnection.setConnectTimeout(5000);//5 secs
-                myConnection.setReadTimeout(5000);//5 secs
+                myConnection.setConnectTimeout(10000);
+                myConnection.setReadTimeout(10000);
                 myConnection.setRequestMethod("POST");
                 myConnection.setRequestProperty("User-Agent", paylahID);
                 myConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                myConnection.setRequestProperty("Accept","application/json");
+                myConnection.setDoInput(true);
                 myConnection.setDoOutput(true);
                 myConnection.setFixedLengthStreamingMode(postTaskOutput.JSONDataString.length());
+
+
 
                 // Write to server
                 /*
@@ -396,17 +407,21 @@ public class DatabaseConnector {
                 wr.write(postTaskOutput.JSONData);
                 */
                 // DEBUG
+                OutputStream out = new BufferedOutputStream(myConnection.getOutputStream());
+                BufferedWriter writer = new BufferedWriter (new OutputStreamWriter(out, "UTF-8"));
+                writer.write(postTaskOutput.JSONDataString);
+                writer.flush();
+                writer.close();
+                out.close();
+                myConnection.connect();
                 /*
-                System.out.println("Stream start");
-                OutputStream os = myConnection.getOutputStream();
-                os.write(postTaskOutput.JSONData);
-                os.close();
-                System.out.println("Stream end");
-                */
                 OutputStreamWriter out = new OutputStreamWriter(myConnection.getOutputStream());
                 out.write(postTaskOutput.JSONDataString);
                 out.flush();
                 out.close();
+                myConnection.connect();
+                */
+
                 int res = myConnection.getResponseCode();
                 System.out.print("PostTask Server response code: ");
                 System.out.println(res);

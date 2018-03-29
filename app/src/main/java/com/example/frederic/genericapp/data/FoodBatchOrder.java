@@ -31,6 +31,7 @@ public class FoodBatchOrder extends PostObject{
         }
         return count;
     }
+
     public void deleteAll(int foodId){
         ArrayList<FoodOrder> removeOrder = new ArrayList<>();
         for(FoodOrder order : foodOrders){
@@ -39,5 +40,14 @@ public class FoodBatchOrder extends PostObject{
             }
         }
         foodOrders.removeAll(removeOrder);
+    }
+
+    /**
+     * Debuging Function to print all items
+     */
+    public void printItems(){
+        for (FoodOrder f:foodOrders){
+            System.out.println(f.foodId);
+        }
     }
 }

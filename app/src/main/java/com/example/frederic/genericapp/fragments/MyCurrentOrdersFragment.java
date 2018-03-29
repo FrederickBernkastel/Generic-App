@@ -161,7 +161,7 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
 
     @Override
     public void fetchFinish(FetchedObject output) {
-        System.out.println("FETCH FIN");
+
         // TODO: Launch ErrorActivity
         if (output==null){
             System.out.println("Error connecting to server in CurrentOrdersFragment");

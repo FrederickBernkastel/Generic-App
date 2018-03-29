@@ -97,6 +97,7 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
         // Recording orders
         pendingOrders = fragment.pendingOrders;
 
+
         // Launch Dialog Fragment
         new ConfirmOrderDialogFragment().show(getFragmentManager(),"ConfirmOrderDialogFragment");
     }
@@ -133,6 +134,7 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
             return;
         }
         // Delete all pending orders if POST success
+        System.out.println(response);
         SharedPrefManager<FoodBatchOrder> prefManager = new SharedPrefManager<>();
         pendingOrders = null;
         prefManager.saveObj(getString(R.string.key_batch_orders),pendingOrders,MyOrdersActivity.this);

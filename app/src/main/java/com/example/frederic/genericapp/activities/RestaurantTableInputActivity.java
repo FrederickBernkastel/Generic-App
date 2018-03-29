@@ -39,7 +39,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
     public static ArrayList<TextView> viewList;
     private int tableNumber;
     private int peopleNumber;
-    private String randomPaylahId = "87425199";
+    private String randomPaylahId;
 
     enum FetchState{
         ISPEOPLE,
@@ -60,6 +60,7 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
         fragmentTransaction.commit();
         currState = FetchState.ISTABLE;
 
+        randomPaylahId = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),RestaurantTableInputActivity.this,String.class);
 
         // Get screen size
         DisplayMetrics displayMetrics = new DisplayMetrics();
