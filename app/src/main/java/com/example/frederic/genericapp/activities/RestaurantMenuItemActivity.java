@@ -1,24 +1,14 @@
 package com.example.frederic.genericapp.activities;
 
 import android.graphics.Color;
-import android.graphics.Interpolator;
-import android.os.Build;
-import android.support.v4.view.animation.FastOutLinearInInterpolator;
-import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.transition.TransitionManager;
-import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,9 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.example.frederic.genericapp.data.FoodBatchOrder;
-import com.example.frederic.genericapp.data.FoodOrder;
-import com.example.frederic.genericapp.data.MenuItem;
+import com.example.frederic.genericapp.data.post.FoodBatchOrder;
+import com.example.frederic.genericapp.data.post.FoodOrder;
+import com.example.frederic.genericapp.data.get.MenuItem;
 import com.example.frederic.genericapp.ImageResize;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;

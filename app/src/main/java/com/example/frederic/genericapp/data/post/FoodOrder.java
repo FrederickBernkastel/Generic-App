@@ -1,4 +1,4 @@
-package com.example.frederic.genericapp.data;
+package com.example.frederic.genericapp.data.post;
 
 /**
  * Data class to store information on single pending food order

@@ -1,5 +1,7 @@
-package com.example.frederic.genericapp.data;
+package com.example.frederic.genericapp.data.get;
 
+
+import com.example.frederic.genericapp.data.DatabaseConnector;
 
 /**
  * Parent object of everything fetched from database

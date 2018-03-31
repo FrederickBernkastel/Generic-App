@@ -15,7 +15,8 @@
     <string name="add_item">Add</string>
     <string name="add_special_request_header">Item %s</string>
     <string name="price_total">TOTAL</string>
-    <string name="order_now">🍴 ORDER NOW 🍴</string>
+    <string name="item_price_total">FOOD\nTOTAL</string>
+    <string name="order_now">🍴ORDER NOW🍴</string>
     <string name="refresh">⟳ refresh ⟳</string>
     <string name="pending_orders">Pending Orders</string>
     <string name="sent_orders">Sent Orders</string>
@@ -44,6 +45,7 @@
         Minus icon made by Hadrien from flaticon.com\n
         Plus icon made by Minh Hoang from flaticon.com\n
         Payment icon made by Smashicons from flaticon.com\n
+        Loading icon made by roundicons from flaticon.com
     </string>
 
     <!-- String Keys -->
@@ -52,6 +54,9 @@
     <string name="key_batch_orders">food_orders</string>
     <string name="key_plid">plid</string>
     <string name="key_table_no">table_no</string>
+    <string name="key_is_duration_based">is_duration_based</string>
+
+    <string name="title_activity_main2">Main2Activity</string>
 
 
 </resources>

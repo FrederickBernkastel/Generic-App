@@ -17,16 +17,17 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.frederic.genericapp.data.AsyncFetchResponse;
+import com.example.frederic.genericapp.data.get.AsyncFetchResponse;
 import com.example.frederic.genericapp.data.DatabaseConnector;
-import com.example.frederic.genericapp.data.FetchedObject;
-import com.example.frederic.genericapp.data.FoodStatus;
-import com.example.frederic.genericapp.data.FoodStatuses;
-import com.example.frederic.genericapp.data.MenuItem;
-import com.example.frederic.genericapp.data.RestaurantMenu;
+import com.example.frederic.genericapp.data.get.DurationResponse;
+import com.example.frederic.genericapp.data.get.FetchedObject;
+import com.example.frederic.genericapp.data.get.FoodStatus;
+import com.example.frederic.genericapp.data.get.FoodStatuses;
+import com.example.frederic.genericapp.data.get.MenuItem;
+import com.example.frederic.genericapp.data.get.RestaurantMenu;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
-import com.example.frederic.genericapp.data.TransactionStatus;
+import com.example.frederic.genericapp.data.get.TransactionStatus;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.identity.intents.model.UserAddress;
@@ -46,16 +47,27 @@ import com.google.android.gms.wallet.WalletConstants;
 import com.stripe.android.model.Token;
 
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class MyBillActivity extends Activity implements AsyncFetchResponse{
 
     private GridView gridView;
     private TextView totalPrice;
-    private boolean allowBilling;
+    private TextView durationText;
+
+
     private PaymentsClient paymentsClient;
     private final int LOAD_PAYMENT_DATA_REQUEST_CODE = 1;
+
+    private boolean allowBilling;
     private String plid;
+    private int tableNo;
+    private double durationPrice;
+    private double itemPrice;
+    private RestaurantMenu menu;
+    private ReentrantLock paymentLock = new ReentrantLock();
 
 
     @Override
@@ -65,6 +77,12 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
 
         gridView = findViewById(R.id.my_bill_activity_grid);
         totalPrice = findViewById(R.id.my_bill_activity_price);
+        durationText = findViewById(R.id.my_bill_activity_duration);
+
+        plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyBillActivity.this,String.class);
+        tableNo = new SharedPrefManager<Integer>().fetchObj(getString(R.string.key_table_no),MyBillActivity.this,Integer.class);
+        menu = new SharedPrefManager<RestaurantMenu>().fetchObj(getString(R.string.key_restaurant_menu),MyBillActivity.this,RestaurantMenu.class);
+
 
          paymentsClient = Wallet.getPaymentsClient(this,
                             new Wallet.WalletOptions.Builder().setEnvironment(WalletConstants.ENVIRONMENT_TEST)
@@ -80,8 +98,12 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
         // Prevent billing until latest fetch has finished
         allowBilling = false;
 
-        // Fetch order status from server
-        plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyBillActivity.this,String.class);
+        // Extract stored information
+        boolean isDurationBased = new SharedPrefManager<Boolean>().fetchObj(
+                getString(R.string.key_is_duration_based),
+                MyBillActivity.this,
+                Boolean.class
+        );
 
         /*
         // TODO: INSERT RESTAURANT MENU FOR DEBUGGING, DELETE WHEN DONE
@@ -151,6 +173,11 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
         try {
             DatabaseConnector.FetchTaskInput input = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.EXISTINGORDERS);
             new DatabaseConnector.FetchTask(MyBillActivity.this).execute(input);
+            if (isDurationBased){
+                input = new DatabaseConnector.FetchTaskInput(plid,tableNo,DatabaseConnector.FetchMode.DURATION);
+                new DatabaseConnector.FetchTask(MyBillActivity.this).execute(input);
+            }
+
         } catch (Exception e){
             System.out.println("Error parsing DatabaseConnector input in MyBillActivity. Was the correct mode used?");
             // Terminate this activity
@@ -167,7 +194,8 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
         // Reset views
         GridAdapter gridAdapter = new GridAdapter(MyBillActivity.this,foodStatuses,menu);
         gridView.setAdapter(gridAdapter);
-        totalPrice.setText(gridAdapter.getTotalPrice());
+        itemPrice = gridAdapter.totalPrice;
+        totalPrice.setText(menu.formatPrice(itemPrice+durationPrice));
     }
 
     @Override
@@ -183,18 +211,11 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
         switch (output.fetchMode){
             case EXISTINGORDERS:
                 FoodStatuses foodStatuses = (FoodStatuses) output;
-                // Inform user that not all orders have been fulfilled with a DialogFragment
-                if (! foodStatuses.isAllFulfilled()){
-                    displayBillDeniedAlert();
-                    /*
-                    // DEBUG ONLY
-                    for(FoodStatus f:foodStatuses.statuses){
-                        f.delivered += f.pending;
-                        f.pending = 0;
-                    }
 
-                    // END OF DEBUG ONLY
-                    */
+                // DEBUG / TESTING ONLY
+                // Inform user that not all orders have been fulfilled with a DialogFragment
+                if (! foodStatuses.isAllFulfilled() &&false){
+                    displayBillDeniedAlert();
                 } else {
                     // Allow billing
                     allowBilling = true;
@@ -213,8 +234,22 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
                     finish();
                 } else {
                     displayBillFailedAlert();
+                    paymentLock.unlock();
                 }
                 break;
+            case DURATION:
+                DurationResponse durationResponse = (DurationResponse) output;
+                durationText.setText(String.format(
+                        Locale.US,"%d hours %d minutes / %s",
+                        durationResponse.hours,
+                        durationResponse.minutes,
+                        menu.formatPrice(durationResponse.price)
+                ));
+                durationText.setVisibility(View.VISIBLE);
+
+                // Update total price
+                durationPrice = durationResponse.price;
+                totalPrice.setText(menu.formatPrice(durationPrice+itemPrice));
         }
     }
 
@@ -356,14 +391,16 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
      */
     private void chargeToken(String tokenID){
         // Send tokenID to server
-        DatabaseConnector.FetchTaskInput input;
-        try {
-            input = new DatabaseConnector.FetchTaskInput(plid,tokenID,DatabaseConnector.FetchMode.STRIPEPAYMENT);
-        } catch (Exception e) {
-            System.out.println("Invalid FetchTaskInput parameters in MyBillActivity");
-            return;
+        if( paymentLock.tryLock()) {
+            DatabaseConnector.FetchTaskInput input;
+            try {
+                input = new DatabaseConnector.FetchTaskInput(plid, tokenID, DatabaseConnector.FetchMode.STRIPEPAYMENT);
+            } catch (Exception e) {
+                System.out.println("Invalid FetchTaskInput parameters in MyBillActivity");
+                return;
+            }
+            new DatabaseConnector.FetchTask(MyBillActivity.this).execute(input);
         }
-        new DatabaseConnector.FetchTask(MyBillActivity.this).execute(input);
     }
 
     /**
@@ -412,9 +449,7 @@ class GridAdapter extends BaseAdapter{
             "Qty",
             "Price"
     };
-    private Double totalPrice;
-    // Stores last MenuItem in order to access its Price Formatting methods
-    private MenuItem lastMenuItem;
+    Double totalPrice;
 
 
     GridAdapter(Context context, FoodStatuses foodStatuses,RestaurantMenu menu){
@@ -435,11 +470,10 @@ class GridAdapter extends BaseAdapter{
             gridValues[i++] = item.name;
             gridValues[i++] = String.valueOf(foodStatus.delivered);
 
-            // TODO: Simplification of price used as substitution for actual
-            gridValues[i++] = item.formatPrice(item.priceVal*foodStatus.delivered);
-            totalPrice += item.priceVal*foodStatus.delivered;
 
-            lastMenuItem = item;
+            gridValues[i++] = item.formatPrice(foodStatus.totalPrice);
+            totalPrice += foodStatus.totalPrice;
+
 
         }
 
@@ -506,14 +540,5 @@ class GridAdapter extends BaseAdapter{
         return gridValues.length/3;
     }
 
-    /**
-     * Function to extract the total price of all items, formatted to local currency
-     * @return
-     */
-    String getTotalPrice(){
-        if (totalPrice==null||lastMenuItem==null){
-            return "";
-        }
-        return lastMenuItem.formatPrice(totalPrice);
-    }
+
 }

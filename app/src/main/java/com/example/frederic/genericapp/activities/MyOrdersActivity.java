@@ -10,28 +10,39 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.frederic.genericapp.data.AsyncFetchResponse;
-import com.example.frederic.genericapp.data.AsyncPostResponse;
+import com.example.frederic.genericapp.data.get.AsyncFetchResponse;
+import com.example.frederic.genericapp.data.post.AsyncPostResponse;
 import com.example.frederic.genericapp.data.DatabaseConnector;
-import com.example.frederic.genericapp.data.FetchedObject;
-import com.example.frederic.genericapp.data.FoodBatchOrder;
+import com.example.frederic.genericapp.data.get.FetchedObject;
+import com.example.frederic.genericapp.data.post.FoodBatchOrder;
 import com.example.frederic.genericapp.fragments.ConfirmOrderDialogFragment;
 import com.example.frederic.genericapp.fragments.MyCurrentOrdersFragment;
 import com.example.frederic.genericapp.fragments.MyPendingOrdersFragment;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * Class with tabs to display pending / sent orders
  * Created by: Frederick Bernkastel
  */
-public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MyPendingOrdersFragment.ConfirmOrderListener, ConfirmOrderDialogFragment.ConfirmOrderDialogListener, AsyncPostResponse,AsyncFetchResponse{
+public class MyOrdersActivity
+        extends AppCompatActivity
+        implements TabLayout.OnTabSelectedListener,
+            MyPendingOrdersFragment.ConfirmOrderListener,
+            ConfirmOrderDialogFragment.ConfirmOrderDialogListener,
+            MyCurrentOrdersFragment.RefreshOrderListener,
+            AsyncPostResponse,
+            AsyncFetchResponse{
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
     private PagerAdapter adapter;
     private FoodBatchOrder pendingOrders;
 
     private boolean layoutCreated;
+    private ReentrantLock orderLock = new ReentrantLock();
+    private String plid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +50,7 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
         setContentView(R.layout.activity_my_orders);
 
         // Extract plid
-        String plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyOrdersActivity.this,String.class);
+        plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyOrdersActivity.this,String.class);
 
         layoutCreated = false;
 
@@ -104,24 +115,42 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
 
     @Override
     public void onDialogConfirm(android.app.Fragment fragment) {
-        // Post to server
-        String plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),MyOrdersActivity.this,String.class);
-        DatabaseConnector.PostTaskOutput output;
-        try {
-            output = new DatabaseConnector.PostTaskOutput(plid, pendingOrders);
-        } catch (Exception e){
+        if (orderLock.tryLock()) {
+            // Post to server
+            String plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid), MyOrdersActivity.this, String.class);
+            DatabaseConnector.PostTaskOutput output;
+            try {
+                output = new DatabaseConnector.PostTaskOutput(plid, pendingOrders);
+            } catch (Exception e) {
 
-            System.out.println("Error parsing DatabaseConnector input in MyOrdersActivity.");
+                System.out.println("Error parsing DatabaseConnector input in MyOrdersActivity.");
+                System.out.println(e.getMessage());
+                // Terminate this activity, and close entire app
+                this.finish();
+                android.os.Process.killProcess(android.os.Process.myPid());
+                return;
+            }
+            new DatabaseConnector.PostTask(MyOrdersActivity.this).execute(output);
+        }
+
+
+
+    }
+
+    @Override
+    public void onRefreshSelected(MyCurrentOrdersFragment fragment){
+        // Get server data
+        DatabaseConnector.FetchTaskInput input;
+        try {
+            input = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.EXISTINGORDERS);
+        } catch(Exception e){
+            System.out.println("Error constructing DatabaseConnector input, was the wrong mode used?");
             System.out.println(e.getMessage());
-            // Terminate this activity, and close entire app
-            this.finish();
-            android.os.Process.killProcess(android.os.Process.myPid());
             return;
         }
-        new DatabaseConnector.PostTask(MyOrdersActivity.this).execute(output);
 
-
-
+        // Starts AsyncTask
+        new DatabaseConnector.FetchTask(MyOrdersActivity.this).execute(input);
     }
 
     @Override
@@ -131,6 +160,7 @@ public class MyOrdersActivity extends AppCompatActivity implements TabLayout.OnT
             Intent intent = new Intent(MyOrdersActivity.this, ErrorActivity.class);
             startActivity(intent);
             ErrorActivity.errorType = ErrorActivity.ErrorType.NOCONNECTION;
+            orderLock.unlock();
             return;
         }
         // Delete all pending orders if POST success

@@ -7,6 +7,18 @@ package com.example.frederic.genericapp.data;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.frederic.genericapp.data.get.AsyncFetchResponse;
+import com.example.frederic.genericapp.data.get.DurationResponse;
+import com.example.frederic.genericapp.data.get.SessionInfo;
+import com.example.frederic.genericapp.data.get.FetchedObject;
+import com.example.frederic.genericapp.data.get.FoodStatuses;
+import com.example.frederic.genericapp.data.get.RestaurantMenu;
+import com.example.frederic.genericapp.data.get.TableNumResponse;
+import com.example.frederic.genericapp.data.get.TransactionStatus;
+import com.example.frederic.genericapp.data.post.AsyncPostResponse;
+import com.example.frederic.genericapp.data.post.FoodBatchOrder;
+import com.example.frederic.genericapp.data.post.FoodOrder;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,8 +50,10 @@ public class DatabaseConnector {
         TABLENO,
         PEOPLENO,
         EXISTINGORDERS,
+        DURATION,
         DELETESESSION,
-        STRIPEPAYMENT
+        STRIPEPAYMENT,
+        SESSIONINFO
     }
 
 
@@ -143,20 +157,7 @@ public class DatabaseConnector {
      * @return      foodStatuses
      */
     private static FoodStatuses parseFoodStatusResponse(String s){
-        /*  JSON FORMAT FOR INPUT FOOD STATUSES
-            {
-                "orders": [ {
-                    "table_number": 3,
-                    "start_time": "2018-03-14 01:56:48.426864",
-                    "food_id":103,
-                    "delivered":false
-                    "comments":"comment"
-                 }, {
-                    ...
-                 }]
-            }
 
-         */
         FoodStatuses foodStatuses = new FoodStatuses();
         try {
 
@@ -184,10 +185,49 @@ public class DatabaseConnector {
         switch (s){
             case "Payment Success":
                 return new TransactionStatus(true);
+            case "Payment Fail":
+                return new TransactionStatus(false);
         }
         return null;
     }
 
+    /**
+     * Parse server response to duration GET
+     */
+    private static FetchedObject parseDurationResponse(String s){
+        try {
+
+            JSONObject restaurantJSON = new JSONObject(s);
+            double price = restaurantJSON.getDouble("time_price");
+            int hours = restaurantJSON.getInt("hours");
+            int minutes = restaurantJSON.getInt("minutes");
+
+            return new DurationResponse(hours,minutes,price);
+
+        } catch (JSONException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Special function to fetch session information
+     */
+    private static FetchedObject parseTableNumResponse(String s){
+
+        SessionInfo info = new SessionInfo();
+        try {
+
+            JSONObject restaurantJSON = new JSONObject(s);
+            JSONArray jsonStatuses = restaurantJSON.getJSONArray("orders");
+            JSONObject item = jsonStatuses.getJSONObject(0);
+            int tableNo = item.getInt("table_number");
+            info.tableNo = tableNo;
+            return info;
+        } catch (JSONException e){
+            throw new RuntimeException(e);
+        }
+
+    }
 
     /**
      * Input information for fetching data from database using AsyncTask
@@ -206,6 +246,9 @@ public class DatabaseConnector {
                     break;
                 case MENU:
                     ServerURLTail = String.format(Locale.US,"/menu?table_number=%d",tableNumber);
+                    break;
+                case DURATION:
+                    ServerURLTail = String.format(Locale.US,"/get_time_price?plid=%s&table_number=%d",paylahID,tableNumber);
                     break;
                 default:
                     throw new Exception("Invalid FetchTaskInput parameters");
@@ -237,6 +280,10 @@ public class DatabaseConnector {
                     break;
                 case DELETESESSION:
                     ServerURLTail = String.format(Locale.US,"/exit?plid=%s",paylahID);
+                    break;
+                case SESSIONINFO:
+                    // Warning: Repeat of existing orders code
+                    ServerURLTail = String.format(Locale.US,"/existing_orders?plid=%s",paylahID);
                     break;
                 default:
                     throw new Exception("Invalid FetchTaskInput parameters");
@@ -281,7 +328,7 @@ public class DatabaseConnector {
             while(true) {
 
                 try {
-                    //DEBUG
+                    // DEBUG
                     System.out.print("Connecting to: ");
                     System.out.println(fetchTaskInput.ServerURLString);
 
@@ -292,8 +339,8 @@ public class DatabaseConnector {
                     HttpURLConnection myConnection = (HttpURLConnection) serverURL.openConnection();
 
                     // Set request Headers
-                    myConnection.setConnectTimeout(10000);
-                    myConnection.setReadTimeout(10000);
+                    myConnection.setConnectTimeout(15000);
+                    myConnection.setReadTimeout(15000);
                     myConnection.setRequestMethod("GET");
                     myConnection.setRequestProperty("User-Agent", paylahID);
 
@@ -301,6 +348,7 @@ public class DatabaseConnector {
                         // Connection success, read string
                         String response = readConnectionInput(myConnection);
 
+                        myConnection.disconnect();
 
                         // DEBUG
                         System.out.print("Server Fetch Response: ");
@@ -318,15 +366,41 @@ public class DatabaseConnector {
                             case EXISTINGORDERS:
                                 fetchedObject = parseFoodStatusResponse(response);
                                 break;
+                            case DURATION:
+                                fetchedObject = parseDurationResponse(response);
                             case DELETESESSION:
                                 break;
                             case STRIPEPAYMENT:
                                 fetchedObject = parseStripeTransactionResponse(response);
                                 break;
-
+                            case SESSIONINFO:
+                                if(attemptNo==0){
+                                    fetchedObject = parseTableNumResponse(response);
+                                    try {
+                                        fetchTaskInput = new FetchTaskInput(fetchTaskInput.paylahID, ((SessionInfo) fetchedObject).tableNo, FetchMode.MENU);
+                                        fetchTaskInput.fetchMode = FetchMode.SESSIONINFO;
+                                    } catch (Exception e){
+                                        throw new IOException();
+                                    }
+                                } else if (attemptNo == 1){
+                                    SessionInfo info = (SessionInfo) fetchedObject;
+                                    info.menu = parseJSONMenu(response);
+                                    fetchedObject = info;
+                                    try {
+                                        fetchTaskInput = new FetchTaskInput(fetchTaskInput.paylahID, ((SessionInfo) fetchedObject).tableNo, FetchMode.DURATION);
+                                        fetchTaskInput.fetchMode = FetchMode.SESSIONINFO;
+                                    } catch (Exception e){
+                                        throw new IOException();
+                                    }
+                                } else {
+                                    SessionInfo info = (SessionInfo) fetchedObject;
+                                    info.isDuration = (((DurationResponse)parseDurationResponse(response)).price>0);
+                                    fetchedObject = info;
+                                    fetchTaskInput.fetchMode = FetchMode.SESSIONINFO;
+                                }
+                                break;
                         }
                         fetchedObject.fetchMode = fetchTaskInput.fetchMode;
-                        myConnection.disconnect();
                         return fetchedObject;
 
                     } else {

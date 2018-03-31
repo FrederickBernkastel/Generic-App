@@ -1,4 +1,4 @@
-package com.example.frederic.genericapp.data;
+package com.example.frederic.genericapp.data.get;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,6 +71,14 @@ public class RestaurantMenu extends FetchedObject {
             String s = String.format(Locale.US,"id %d\nprice %s\nname %s\ndescription %s",item.id,item.price,item.name,item.description);
             System.out.println(s);
         }
+    }
+
+    /**
+     * Function to format price according to region
+     * Pre-condition: Menu has at least 1 item
+     */
+    public String formatPrice(double priceVal){
+        return menu.get(0).formatPrice(priceVal);
     }
 
 }

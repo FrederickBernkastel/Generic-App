@@ -1,4 +1,4 @@
-package com.example.frederic.genericapp.data;
+package com.example.frederic.genericapp.data.get;
 
 import android.support.annotation.NonNull;
 

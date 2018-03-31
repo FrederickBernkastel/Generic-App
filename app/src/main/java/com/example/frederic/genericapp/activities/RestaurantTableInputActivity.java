@@ -17,12 +17,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.frederic.genericapp.data.AsyncFetchResponse;
+import com.example.frederic.genericapp.data.get.AsyncFetchResponse;
 import com.example.frederic.genericapp.data.DatabaseConnector;
-import com.example.frederic.genericapp.data.FetchedObject;
-import com.example.frederic.genericapp.data.FoodBatchOrder;
-import com.example.frederic.genericapp.data.RestaurantMenu;
-import com.example.frederic.genericapp.data.TableNumResponse;
+import com.example.frederic.genericapp.data.get.FetchedObject;
+import com.example.frederic.genericapp.data.post.FoodBatchOrder;
+import com.example.frederic.genericapp.data.get.RestaurantMenu;
+import com.example.frederic.genericapp.data.get.TableNumResponse;
 import com.example.frederic.genericapp.ImageResize;
 import com.example.frederic.genericapp.fragments.PeopleFragment;
 import com.example.frederic.genericapp.R;
@@ -280,6 +280,14 @@ public class RestaurantTableInputActivity extends AppCompatActivity implements A
 
                 // Wipe previous pending_orders
                 new SharedPrefManager<FoodBatchOrder>().saveObj(getString(R.string.key_batch_orders),new FoodBatchOrder(),RestaurantTableInputActivity.this);
+
+                // Save boolean indicating if duration-based payment
+                // Assumes that if peopleNumRequired, then duration based payment
+                new SharedPrefManager<Boolean>().saveObj(
+                        getString(R.string.key_is_duration_based),
+                        tableNumResponse.isPeopleNumRequired,
+                        RestaurantTableInputActivity.this
+                );
 
                 if (tableNumResponse.isPeopleNumRequired) {
                     TransitionManager.beginDelayedTransition((ViewGroup) findViewById(R.id.fragment_container));

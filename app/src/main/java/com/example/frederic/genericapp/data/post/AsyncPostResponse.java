@@ -1,4 +1,4 @@
-package com.example.frederic.genericapp.data;
+package com.example.frederic.genericapp.data.post;
 
 /**
  * Project GenericApp

@@ -21,12 +21,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
-import com.example.frederic.genericapp.data.AsyncFetchResponse;
+import com.example.frederic.genericapp.data.get.AsyncFetchResponse;
 import com.example.frederic.genericapp.data.DatabaseConnector;
-import com.example.frederic.genericapp.data.FetchedObject;
-import com.example.frederic.genericapp.data.FoodStatuses;
+import com.example.frederic.genericapp.data.get.FetchedObject;
+import com.example.frederic.genericapp.data.get.FoodStatuses;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
+import com.example.frederic.genericapp.data.get.RestaurantMenu;
+import com.example.frederic.genericapp.data.get.SessionInfo;
 
 /**
  * Main menu of activity
@@ -161,14 +163,42 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
 
             return;
         }
-        FoodStatuses foodStatuses = (FoodStatuses) output;
-        if(foodStatuses.statuses.size()>0){
-            // Server indicates that there are unpaid bills, launch restaurant menu
-            Intent intent = new Intent(MainActivity.this, RestaurantMainActivity.class);
-            startActivity(intent);
+        switch (output.fetchMode) {
+            case EXISTINGORDERS:
+                FoodStatuses foodStatuses = (FoodStatuses) output;
+                if (foodStatuses.statuses.size() > 0) {
+                    // Server indicates that there are unpaid bills
+                    //Check if tableNo exists
+                    if (new SharedPrefManager<Integer>().fetchObj(getString(R.string.key_table_no),MainActivity.this,Integer.class)==null){
+                        // Fetch missing information from server
+                        try {
+                            DatabaseConnector.FetchTaskInput input = new DatabaseConnector.FetchTaskInput(plid, DatabaseConnector.FetchMode.SESSIONINFO);
+                            new DatabaseConnector.FetchTask(this).execute(input);
+                            return;
+                        } catch(Exception e){
+                            e.printStackTrace();
+                            this.finish();
 
-        } else {
-            allowAccess = true;
+                        }
+                    }
+
+                    // Launch restaurant menu
+                    Intent intent = new Intent(MainActivity.this, RestaurantMainActivity.class);
+                    startActivity(intent);
+
+                } else {
+                    allowAccess = true;
+                }
+                break;
+            case SESSIONINFO:
+                // Save session information
+                SessionInfo info = (SessionInfo) output;
+                new SharedPrefManager<Boolean>().saveObj(getString(R.string.key_is_duration_based),info.isDuration,this);
+                new SharedPrefManager<RestaurantMenu>().saveObj(getString(R.string.key_restaurant_menu),info.menu,this);
+                new SharedPrefManager<Integer>().saveObj(getString(R.string.key_table_no),info.tableNo,this);
+                // Launch restaurant menu
+                Intent intent = new Intent(MainActivity.this, RestaurantMainActivity.class);
+                startActivity(intent);
         }
 
 

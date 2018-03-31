@@ -24,7 +24,7 @@ public class ImageResize extends Object {
     // FOR PULLING IMAGE FROM URL TO LOAD INTO AN IMAGEVIEW
 
     public static void loadImageByUrl(Context context, String url, ImageView newImage, int theWidth, int theHeight){
-        Picasso.with(context).load(url).resize(theWidth,theHeight).into(newImage);
+        Picasso.with(context).load(url).resize(theWidth,theHeight).placeholder( R.drawable.progress_image_animation ).into(newImage);
     }
 
     // FOR RESIZING OF DRAWABLES IN LOCAL DRAWABLES FOLDER

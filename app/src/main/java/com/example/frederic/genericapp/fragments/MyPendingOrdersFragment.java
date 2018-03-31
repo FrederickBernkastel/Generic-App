@@ -19,10 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.frederic.genericapp.activities.RestaurantMenuItemActivity;
-import com.example.frederic.genericapp.data.FoodBatchOrder;
-import com.example.frederic.genericapp.data.FoodOrder;
-import com.example.frederic.genericapp.data.MenuItem;
-import com.example.frederic.genericapp.data.RestaurantMenu;
+import com.example.frederic.genericapp.data.post.FoodBatchOrder;
+import com.example.frederic.genericapp.data.post.FoodOrder;
+import com.example.frederic.genericapp.data.get.MenuItem;
+import com.example.frederic.genericapp.data.get.RestaurantMenu;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
 

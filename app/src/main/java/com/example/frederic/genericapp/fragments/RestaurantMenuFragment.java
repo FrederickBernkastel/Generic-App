@@ -19,8 +19,8 @@ import android.widget.TextView;
 
 
 import com.example.frederic.genericapp.activities.RestaurantMenuItemActivity;
-import com.example.frederic.genericapp.data.MenuItem;
-import com.example.frederic.genericapp.data.RestaurantMenu;
+import com.example.frederic.genericapp.data.get.MenuItem;
+import com.example.frederic.genericapp.data.get.RestaurantMenu;
 import com.example.frederic.genericapp.ImageResize;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;

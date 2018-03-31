@@ -1,10 +1,10 @@
 package com.example.frederic.genericapp;
 
-import com.example.frederic.genericapp.data.AsyncFetchResponse;
+import com.example.frederic.genericapp.data.get.AsyncFetchResponse;
 import com.example.frederic.genericapp.data.DatabaseConnector;
-import com.example.frederic.genericapp.data.FetchedObject;
-import com.example.frederic.genericapp.data.MenuItem;
-import com.example.frederic.genericapp.data.RestaurantMenu;
+import com.example.frederic.genericapp.data.get.FetchedObject;
+import com.example.frederic.genericapp.data.get.MenuItem;
+import com.example.frederic.genericapp.data.get.RestaurantMenu;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

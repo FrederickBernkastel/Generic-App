@@ -10,11 +10,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.frederic.genericapp.data.AsyncFetchResponse;
+import com.example.frederic.genericapp.data.get.AsyncFetchResponse;
 import com.example.frederic.genericapp.data.DatabaseConnector;
-import com.example.frederic.genericapp.data.FetchedObject;
-import com.example.frederic.genericapp.data.FoodStatuses;
-import com.example.frederic.genericapp.data.RestaurantMenu;
+import com.example.frederic.genericapp.data.get.FetchedObject;
+import com.example.frederic.genericapp.data.get.FoodStatuses;
+import com.example.frederic.genericapp.data.get.RestaurantMenu;
 import com.example.frederic.genericapp.ImageResize;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
@@ -137,7 +137,8 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
     protected void onResume() {
         super.onResume();
         noOrders = false;
-        int tableNo = new SharedPrefManager<Integer>().fetchObj(getString(R.string.key_table_no),RestaurantMainActivity.this,Integer.class);
+        int tableNo = new SharedPrefManager<Integer>().fetchObj(getString(R.string.key_table_no), RestaurantMainActivity.this, Integer.class);
+
         String plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),RestaurantMainActivity.this,String.class);
         DatabaseConnector.FetchTaskInput menuInput;
         DatabaseConnector.FetchTaskInput orderInput;

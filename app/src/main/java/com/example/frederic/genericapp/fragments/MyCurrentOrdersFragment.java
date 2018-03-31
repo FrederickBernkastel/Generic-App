@@ -1,6 +1,7 @@
 package com.example.frederic.genericapp.fragments;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,17 +12,18 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.frederic.genericapp.activities.ErrorActivity;
-import com.example.frederic.genericapp.data.AsyncFetchResponse;
-import com.example.frederic.genericapp.data.FetchedObject;
-import com.example.frederic.genericapp.data.FoodStatus;
-import com.example.frederic.genericapp.data.FoodStatuses;
-import com.example.frederic.genericapp.data.MenuItem;
-import com.example.frederic.genericapp.data.RestaurantMenu;
+import com.example.frederic.genericapp.data.get.AsyncFetchResponse;
+import com.example.frederic.genericapp.data.get.FetchedObject;
+import com.example.frederic.genericapp.data.get.FoodStatus;
+import com.example.frederic.genericapp.data.get.FoodStatuses;
+import com.example.frederic.genericapp.data.get.MenuItem;
+import com.example.frederic.genericapp.data.get.RestaurantMenu;
 import com.example.frederic.genericapp.R;
 import com.example.frederic.genericapp.SharedPrefManager;
 
@@ -41,6 +43,12 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
 
     String plid="";
     FoodStatuses foodStatuses;
+    RefreshOrderListener mListener;
+
+    // Interface for fragment to communicate to activity, to request refreshing orders
+    public interface RefreshOrderListener{
+        void onRefreshSelected(MyCurrentOrdersFragment fragment);
+    }
 
     public MyCurrentOrdersFragment() {
         // Required empty public constructor
@@ -66,22 +74,26 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
         // Extract plid
         plid = new SharedPrefManager<String>().fetchObj(getString(R.string.key_plid),getContext(),String.class);
 
+        v.findViewById(R.id.current_orders_fragment_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onRefreshSelected(MyCurrentOrdersFragment.this);
+            }
+        });
+
         return v;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        mListener.onRefreshSelected(this);
+    }
+
+    private void repopulate_table(){
         // Delete all previously loaded items
         table.removeAllViews();
-
-        retrieveCurrentOrders();
-    }
-    private void retrieveCurrentOrders(){
-
-
-    }
-    private void repopulate_table(){
 
         double totalPrice=0;
         // Load menu
@@ -176,4 +188,19 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
         foodStatuses = (FoodStatuses) output;
         repopulate_table();
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // Verify that the host activity implements the callback interface
+        try {
+            // Instantiate the NoticeDialogListener so we can send events to the host
+            mListener = (RefreshOrderListener) context;
+        } catch (ClassCastException e) {
+            // The activity doesn't implement the interface, throw exception
+            throw new ClassCastException(context.toString()
+                    + " must implement ConfirmOrderListener");
+        }
+    }
+
 }

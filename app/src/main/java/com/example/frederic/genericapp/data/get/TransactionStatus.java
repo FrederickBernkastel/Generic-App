@@ -1,6 +1,7 @@
-package com.example.frederic.genericapp.data;
+package com.example.frederic.genericapp.data.get;
 
 
+import com.example.frederic.genericapp.data.get.FetchedObject;
 
 /**
  * Project GenericApp
