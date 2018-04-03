@@ -157,9 +157,8 @@ public class MyOrdersActivity
     public void postFinish(int response) {
         if (response<=-1){
             // Error posting to server, launch ErrorActivity
-            Intent intent = new Intent(MyOrdersActivity.this, ErrorActivity.class);
+            Intent intent = new Intent(MyOrdersActivity.this, ConnectionErrorActivity.class);
             startActivity(intent);
-            ErrorActivity.errorType = ErrorActivity.ErrorType.NOCONNECTION;
             orderLock.unlock();
             return;
         }
@@ -180,9 +179,9 @@ public class MyOrdersActivity
     public void fetchFinish(FetchedObject output) {
         // Unable to connect to server, launch ErrorActivity
         if (output==null){
-            Intent intent = new Intent(MyOrdersActivity.this, ErrorActivity.class);
+            Intent intent = new Intent(MyOrdersActivity.this, ConnectionErrorActivity.class);
             startActivity(intent);
-            ErrorActivity.errorType = ErrorActivity.ErrorType.NOCONNECTION;
+
             return;
         }
         // Waits while layout fragments have not been created

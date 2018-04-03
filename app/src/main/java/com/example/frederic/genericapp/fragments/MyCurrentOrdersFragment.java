@@ -12,12 +12,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.example.frederic.genericapp.activities.ErrorActivity;
+import com.example.frederic.genericapp.activities.ConnectionErrorActivity;
 import com.example.frederic.genericapp.data.get.AsyncFetchResponse;
 import com.example.frederic.genericapp.data.get.FetchedObject;
 import com.example.frederic.genericapp.data.get.FoodStatus;
@@ -179,7 +178,7 @@ public class MyCurrentOrdersFragment extends Fragment implements AsyncFetchRespo
         // Launch ErrorActivity
         if (output==null){
             System.out.println("Error connecting to server in CurrentOrdersFragment");
-            Intent intent = new Intent(getContext(), ErrorActivity.class);
+            Intent intent = new Intent(getContext(), ConnectionErrorActivity.class);
             startActivity(intent);
 
             return;

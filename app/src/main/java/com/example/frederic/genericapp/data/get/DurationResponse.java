@@ -15,3 +15,4 @@ public class DurationResponse extends FetchedObject {
         this.price = price;
     }
 }
+

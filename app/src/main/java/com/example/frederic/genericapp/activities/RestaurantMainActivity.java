@@ -200,9 +200,8 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
     public void fetchFinish(FetchedObject output) {
         if(output == null){
             // No connection? Launch ErrorActivity
-            Intent intent = new Intent(RestaurantMainActivity.this, ErrorActivity.class);
+            Intent intent = new Intent(RestaurantMainActivity.this, ConnectionErrorActivity.class);
             startActivity(intent);
-            ErrorActivity.errorType = ErrorActivity.ErrorType.NOCONNECTION;
             return;
         }
         switch(output.fetchMode){

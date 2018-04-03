@@ -203,9 +203,8 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
 
         if (output==null){
             // Error connecting to server, send to ErrorActivity
-            Intent intent = new Intent(MyBillActivity.this, ErrorActivity.class);
+            Intent intent = new Intent(MyBillActivity.this, ConnectionErrorActivity.class);
             startActivity(intent);
-            ErrorActivity.errorType = ErrorActivity.ErrorType.NOCONNECTION;
             return;
         }
         switch (output.fetchMode){

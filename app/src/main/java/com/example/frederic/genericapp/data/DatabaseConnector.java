@@ -126,7 +126,7 @@ public class DatabaseConnector {
      * @param s         Json String to be parsed
      * @return          TableNumResponse containing formatted information about response
      */
-    private static TableNumResponse parseJSONTableNumResponse(String s){
+    public static TableNumResponse parseJSONTableNumResponse(String s){
         // Possible server responses to GET request
         final String NUMPEOPLETRUE = "True";
         final String NUMPEOPLEFALSE = "False";
@@ -156,7 +156,7 @@ public class DatabaseConnector {
      * @param       s represents JSON string with ordered items
      * @return      foodStatuses
      */
-    private static FoodStatuses parseFoodStatusResponse(String s){
+    public static FoodStatuses parseFoodStatusResponse(String s){
 
         FoodStatuses foodStatuses = new FoodStatuses();
         try {
@@ -194,7 +194,7 @@ public class DatabaseConnector {
     /**
      * Parse server response to duration GET
      */
-    private static FetchedObject parseDurationResponse(String s){
+    public static FetchedObject parseDurationResponse(String s){
         try {
 
             JSONObject restaurantJSON = new JSONObject(s);
@@ -212,7 +212,7 @@ public class DatabaseConnector {
     /**
      * Special function to fetch session information
      */
-    private static FetchedObject parseTableNumResponse(String s){
+    public static FetchedObject parseTableNumResponse(String s){
 
         SessionInfo info = new SessionInfo();
         try {
@@ -437,7 +437,7 @@ public class DatabaseConnector {
      * @param       batchOrder
      * @return      JSON String representing FoodBatchOrder
      */
-    private static String constructJSON(FoodBatchOrder batchOrder){
+    public static String constructJSON(FoodBatchOrder batchOrder){
         int counter = 0;
         int totalOrders = batchOrder.foodOrders.size();
         StringBuilder sBuilder = new StringBuilder("{\"orders\":[");

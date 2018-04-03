@@ -129,9 +129,7 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
 
                     } catch (SecurityException e){
                         // TODO: Exception in getting phone number (no SIM card / encrypted SIM card?) Time for plan B
-                        Intent intent = new Intent(MainActivity.this, ErrorActivity.class);
-                        startActivity(intent);
-                        ErrorActivity.errorType = ErrorActivity.ErrorType.INVALIDPHONENUMBER;
+
 
 
                     }
@@ -139,9 +137,7 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
 
                 } else {
                     // TODO: Permission denied, boo! Time for plan B
-                    Intent intent = new Intent(MainActivity.this, ErrorActivity.class);
-                    startActivity(intent);
-                    ErrorActivity.errorType = ErrorActivity.ErrorType.INVALIDPHONENUMBER;
+
 
 
 
@@ -157,9 +153,9 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
         // Check if fetchObject is null
         if (output==null){
             // Unable to connect to server, link to ErrorActivity
-            Intent intent = new Intent(MainActivity.this, ErrorActivity.class);
+            Intent intent = new Intent(MainActivity.this, ConnectionErrorActivity.class);
             startActivity(intent);
-            ErrorActivity.errorType = ErrorActivity.ErrorType.NOCONNECTION;
+            ;
 
             return;
         }

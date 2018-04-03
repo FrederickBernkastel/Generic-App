@@ -47,7 +47,7 @@
         <activity android:name=".activities.RestaurantMenuItemActivity" />
         <activity android:name=".activities.MyOrdersActivity" />
         <activity android:name=".activities.MyBillActivity" />
-        <activity android:name=".activities.ErrorActivity" />
+        <activity android:name=".activities.ConnectionErrorActivity"></activity>
     </application>
 
 </manifest>
