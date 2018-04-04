@@ -198,6 +198,19 @@ public class MyOrdersActivity
 
         adapter.mCurrentOrdersFragment.fetchFinish(output);
     }
+
+    @Override
+    public void onBackPressed() {
+        if (layoutCreated) {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+    }
 }
 
 

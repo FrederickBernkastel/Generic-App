@@ -15,7 +15,9 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
+import android.transition.Slide;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
 
 import android.widget.Button;
@@ -80,6 +82,7 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
             tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)!= PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_PHONE_STATE},PERMISSION_TO_READ_NUMBER);
+                return;
             }
 
         }
@@ -126,6 +129,7 @@ public class MainActivity extends Activity implements AsyncFetchResponse{
                         // Extract phone number and save locally
                         this.plid = tMgr.getLine1Number();
                         new SharedPrefManager<String>().saveObj(getString(R.string.key_plid),this.plid,MainActivity.this);
+                        onResume();
 
                     } catch (SecurityException e){
                         // TODO: Exception in getting phone number (no SIM card / encrypted SIM card?) Time for plan B

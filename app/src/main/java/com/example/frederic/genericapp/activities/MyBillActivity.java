@@ -187,6 +187,12 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
         }
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+    }
+
     private void refreshExistingOrders(FoodStatuses foodStatuses){
         // Extract restaurant menu
         RestaurantMenu menu = new SharedPrefManager<RestaurantMenu>().fetchObj(getString(R.string.key_restaurant_menu),MyBillActivity.this,RestaurantMenu.class);
@@ -258,7 +264,7 @@ public class MyBillActivity extends Activity implements AsyncFetchResponse{
         // Check if a fetch has been done
         if(allowBilling){
             // DEBUG / TESTING
-            chargeToken("TestID");
+            chargeToken("tok_visa");
             // Remove block for live
             /*
             PaymentDataRequest request = createPaymentDataRequest();
