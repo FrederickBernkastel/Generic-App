@@ -4,14 +4,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-
-import java.io.InputStream;
-import java.net.URL;
 
 /**
  * Created by nixsterchan on 26/2/2018.
@@ -24,7 +19,11 @@ public class ImageResize extends Object {
     // FOR PULLING IMAGE FROM URL TO LOAD INTO AN IMAGEVIEW
 
     public static void loadImageByUrl(Context context, String url, ImageView newImage, int theWidth, int theHeight){
-        Picasso.with(context).load(url).resize(theWidth,theHeight).placeholder( R.drawable.progress_image_animation ).into(newImage);
+        if (theWidth<48||theHeight<48) {
+            Picasso.with(context).load(url).resize(theWidth, theHeight).placeholder(R.drawable.progress_image_animation_small).into(newImage);
+        } else {
+            Picasso.with(context).load(url).resize(theWidth, theHeight).placeholder(R.drawable.progress_image_animation_med).into(newImage);
+        }
     }
 
     // FOR RESIZING OF DRAWABLES IN LOCAL DRAWABLES FOLDER

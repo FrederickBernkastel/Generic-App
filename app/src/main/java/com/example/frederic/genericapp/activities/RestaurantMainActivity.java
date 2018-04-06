@@ -174,18 +174,21 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
     public void onRestaurantMainMenuClick(View v){
         Intent intent = new Intent(RestaurantMainActivity.this,RestaurantMenuActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     // Launches activity to display pending / fulfilled orders
     public void onRestaurantMainOrdersClick(View v){
         Intent intent = new Intent(RestaurantMainActivity.this,MyOrdersActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     // Launches activity to handle billing
     public void onRestaurantMainBillClick(View v){
         Intent intent = new Intent(RestaurantMainActivity.this,MyBillActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     @Override
