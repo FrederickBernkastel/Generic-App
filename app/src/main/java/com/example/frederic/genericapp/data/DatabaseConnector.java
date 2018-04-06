@@ -317,6 +317,7 @@ public class DatabaseConnector {
         public FetchTask(AsyncFetchResponse delegate){
             this.delegate = delegate;
         }
+
         @Override
         protected FetchedObject doInBackground(FetchTaskInput... params) {
             FetchTaskInput fetchTaskInput = params[0];

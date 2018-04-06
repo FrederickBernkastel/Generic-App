@@ -23,8 +23,10 @@ import org.robolectric.RobolectricTestRunner;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.BatchUpdateException;
 import java.util.Locale;
 
+import static org.apache.tools.ant.dispatch.DispatchUtils.execute;
 import static org.junit.Assert.*;
 
 
@@ -73,7 +75,7 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
 
 
     @Test
-    public static  FoodStatuses parseFoodStatusResponseTest(){
+    public void parseFoodStatusResponseTest() throws Exception{
         // messed up string
 
         String s1 ="{\"orders\":[" +
@@ -114,7 +116,6 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
         assertEquals(26.50, food3.totalPrice,0.009);
 
         //TODO: confirm with B man
-        return foodStatuses;
     }
 
 /*
@@ -125,7 +126,7 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
     }*/
 
     @Test
-    public static FetchedObject parseDurationResponseTest(){
+    public void parseDurationResponseTest() throws Exception{
 
         // trying to break the code
         String s3 = "{\"time_price\":2,\"hours\":5,\"minutes\":58}";
@@ -147,8 +148,6 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
         assertEquals(5, durationResponse.hours);
         assertEquals(58, durationResponse.minutes);
 
-
-        return durationResponse;
         }
         /*try {
 
@@ -164,8 +163,10 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
         }
     }*/
 
+
+
     @Test
-    public static FetchedObject parseTableNumResponseTest(){
+    public void parseTableNumResponseTest()throws Exception{
 
         // wrong string
         String s5 ="{\"orders\":[" +
@@ -203,7 +204,7 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
         } catch (JSONException e){
             throw new RuntimeException(e);
         }*/
-        return sessionInfo;
+
     }
 /*
     @Test
@@ -249,11 +250,11 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
 
         // Test FetchMode.PEOPLENO
         input = new DatabaseConnector.FetchTaskInput("1",1,DatabaseConnector.FetchMode.PEOPLENO);
-        assertNull(new DatabaseConnector.FetchTask(this).execute(input).get().response);
+        assertNull(new DatabaseConnector.FetchTask(null).execute(input).get().response);
 
         // Test FetchMode.MENU
         input = new DatabaseConnector.FetchTaskInput("1",1,DatabaseConnector.FetchMode.MENU);
-        RestaurantMenu output = (RestaurantMenu) new DatabaseConnector.FetchTask(this).execute(input).get();
+        RestaurantMenu output = (RestaurantMenu) new DatabaseConnector.FetchTask(null).execute(input).get();
         System.out.println(output.name);
         for (int i =0;i<output.menu.size();i++){
             System.out.println(output.menu.get(i).name);
@@ -263,29 +264,122 @@ public class DatabaseConnectorTest implements AsyncFetchResponse {
     }
 
 
+
+    @Test
+    public void testRegistrationFlow () throws Exception {
+        String fixedPaylahID = "81232135";
+        int fixedTableNumber = 12;
+        int fixedPeopleNumber = 4;
+        FoodBatchOrder newBatchOrder = new FoodBatchOrder();
+
+
+
+
+        try{
+            /////// EXISTING ORDER CHECK ///////
+
+            // Create new fetchtaskinput to get RESPONSE
+            DatabaseConnector.FetchTaskInput fetchTaskInputEO =
+                    new DatabaseConnector.FetchTaskInput(fixedPaylahID, DatabaseConnector.FetchMode.EXISTINGORDERS);
+
+            // Creates fetchtask
+            DatabaseConnector.FetchTask fetchTaskEO= new DatabaseConnector.FetchTask(null);
+
+            // Use fetchtask to pull object from database, INPUTS THE RESPONSE FROM EARLIER into method
+            FetchedObject fEO = fetchTaskEO.execute(fetchTaskInputEO).get();
+
+            // create foodstatuses
+            FoodStatuses foodStatuses = (FoodStatuses) fEO;
+
+            // check if its empty
+            assertEquals(null,(foodStatuses.statuses));
+
+
+            /////// TABLE NUMBER CHECK ///////
+            DatabaseConnector.FetchTaskInput fetchTaskInputTNC =
+                    new DatabaseConnector.FetchTaskInput(fixedPaylahID, fixedTableNumber, DatabaseConnector.FetchMode.TABLENO);
+            DatabaseConnector.FetchTask fetchTaskTNC= new DatabaseConnector.FetchTask(null);
+
+            FetchedObject fTNC = fetchTaskTNC.execute(fetchTaskInputTNC).get();
+
+            // create tablenum response
+            TableNumResponse tableNumResponse = (TableNumResponse) fTNC;
+
+            // test
+            assertTrue(tableNumResponse.isPeopleNumRequired);
+            assertFalse(tableNumResponse.isInvalidTableNum);
+
+
+
+            /////// PEOPLE NUMBER CHECK ///////
+
+
+            DatabaseConnector.FetchTaskInput fetchTaskInputPNC =
+                    new DatabaseConnector.FetchTaskInput(fixedPaylahID, fixedTableNumber, fixedPeopleNumber, DatabaseConnector.FetchMode.PEOPLENO);
+            DatabaseConnector.FetchTask fetchTaskPNC= new DatabaseConnector.FetchTask(null);
+            fetchTaskPNC.execute(fetchTaskInputPNC).get();
+
+
+
+            // repeat people number check
+            DatabaseConnector.FetchTaskInput fetchTaskInputPN2 =
+                    new DatabaseConnector.FetchTaskInput(fixedPaylahID, fixedTableNumber, fixedPeopleNumber, DatabaseConnector.FetchMode.PEOPLENO);
+            DatabaseConnector.FetchTask fetchTaskPN2= new DatabaseConnector.FetchTask(null);
+            fetchTaskPN2.execute(fetchTaskInputPN2);
+
+            // menu check
+            DatabaseConnector.FetchTaskInput fetchTaskInputMenu =
+                    new DatabaseConnector.FetchTaskInput(fixedPaylahID, fixedTableNumber, DatabaseConnector.FetchMode.MENU);
+            DatabaseConnector.FetchTask fetchTaskMenu= new DatabaseConnector.FetchTask(null);
+
+            FetchedObject fMenu = fetchTaskMenu.execute(fetchTaskInputMenu).get();
+
+            RestaurantMenu restaurantMenu = (RestaurantMenu) fMenu;
+
+            //test
+            assertFalse(((RestaurantMenu) fMenu).menu.isEmpty());
+            assertNotEquals(0,((RestaurantMenu) fMenu).name.length());
+            // TODO: assertNotEquals(0,((RestaurantMenu) fMenu).imageURL.
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        // Check if we can break the code
+/*
+        try{
+            // Number exceeds 8 digit limit
+            DatabaseConnector.FetchTaskInput fetchTaskInput1 =
+                    new DatabaseConnector.FetchTaskInput("882281041", DatabaseConnector.FetchMode.EXISTINGORDERS);
+
+            // Number below 8 digit limit
+            DatabaseConnector.FetchTaskInput fetchTaskInput2 =
+                    new DatabaseConnector.FetchTaskInput("8281041", DatabaseConnector.FetchMode.EXISTINGORDERS);
+
+            assertTrue(false);
+        } catch (Exception e){
+            assertTrue(true);
+        }
+*/
+
+
+
+
+
+
+        /////// PEOPLE NUMBER CHECK AGAIN (should give error) ///////
+
+        /////// MENU CHECK ///////
+
+        /////// POST TASK CHECK (sending to database) ///////
+
+        /////// INFO SENT TO DATABASE SUCCESSFULLY CHECK ///////
+
+        /////// STRIPE CHECK ///////
+
+    }
+
     public void fetchFinish(FetchedObject output){
 
         System.out.println("Fetch Successful");
-    }
-
-    @Test
-    public void testRegistrationFlow (){
-
-        // Check existing order
-
-        // Check Table No.
-
-        // Check People No.
-
-        // Check People No. again in case (should give error)
-
-        // Check get Menu
-
-        // Check Post task(sending to database)
-
-        // Check if info sent to Database successfully
-
-        // Check if Stripe can delete finished sessions
-
     }
 }
