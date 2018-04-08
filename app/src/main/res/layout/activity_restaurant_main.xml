@@ -33,71 +33,111 @@
             >
             <TableRow
                 android:onClick="onRestaurantMainHotDishClick">
-                <ImageView
-                    android:id="@+id/restaurant_main_activity_chef_image"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:src="@drawable/activity_restautant_main__icon_chef"
-                    android:scaleType="fitXY"
-                    android:padding="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_hot_dishes"
-                    android:textColor="#000000"
-                    android:textSize="30sp"
-                    />
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/restaurant_main_activity_chef_image"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+
+                        android:src="@drawable/activity_restautant_main__icon_chef"
+                        android:scaleType="fitCenter"
+                        android:padding="10dp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:layout_gravity="center_vertical"
+
+                        android:text="@string/label_hot_dishes"
+                        android:textColor="#000000"
+                        android:textSize="30sp"
+                        />
+                </LinearLayout>
             </TableRow>
             <TableRow
                 android:onClick="onRestaurantMainMenuClick">
-                <ImageView
-                    android:id="@+id/restaurant_main_activity_menu_image"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:src="@drawable/activity_restautant_main__icon_menu"
-                    android:scaleType="fitXY"
-                    android:padding="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_menu"
-                    android:textColor="#000000"
-                    android:textSize="30sp"
-                    />
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/restaurant_main_activity_menu_image"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+
+                        android:src="@drawable/activity_restautant_main__icon_menu"
+                        android:scaleType="fitCenter"
+                        android:padding="10dp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/label_menu"
+                        android:textColor="#000000"
+                        android:textSize="30sp"
+                        />
+                </LinearLayout>
             </TableRow>
             <TableRow
                 android:onClick="onRestaurantMainOrdersClick">
-                <ImageView
-                    android:id="@+id/restaurant_main_activity_orders_image"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:src="@drawable/activity_restautant_main__icon_orders"
-                    android:scaleType="fitXY"
-                    android:padding="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_orders"
-                    android:textColor="#000000"
-                    android:textSize="30sp"
-                    />
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/restaurant_main_activity_orders_image"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+
+                        android:src="@drawable/activity_restautant_main__icon_orders"
+                        android:scaleType="fitXY"
+                        android:padding="10dp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:layout_gravity="center_vertical"
+
+                        android:text="@string/label_orders"
+                        android:textColor="#000000"
+                        android:textSize="30sp"
+                        />
+                </LinearLayout>
             </TableRow>
             <TableRow
                 android:onClick="onRestaurantMainBillClick">
-                <ImageView
-                    android:id="@+id/restaurant_main_activity_bill_image"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:src="@drawable/activity_restautant_main__icon_bill"
-                    android:scaleType="fitXY"
-                    android:padding="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_bill"
-                    android:textColor="#000000"
-                    android:textSize="30sp"
-                    />
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/restaurant_main_activity_bill_image"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+
+                        android:src="@drawable/activity_restautant_main__icon_bill"
+                        android:scaleType="fitXY"
+                        android:padding="10dp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:layout_gravity="center_vertical"
+
+                        android:text="@string/label_bill"
+                        android:textColor="#000000"
+                        android:textSize="30sp"
+                        />
+                </LinearLayout>
             </TableRow>
         </TableLayout>
 

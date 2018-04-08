@@ -37,6 +37,7 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
         int width = displayMetrics.widthPixels;
 
         // Set icon sizes
+        /*
         int size = width/5;
         ArrayList<Integer> bitmap_ids = new ArrayList<>(Arrays.asList(
                 R.id.restaurant_main_activity_chef_image,
@@ -57,6 +58,7 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
             Bitmap d = ImageResize.decodeSampledBitmapFromResource(getResources(),bitmap_drawable,size,size);
             imageView.setImageBitmap(d);
         }
+        */
 
         //Test
         try {

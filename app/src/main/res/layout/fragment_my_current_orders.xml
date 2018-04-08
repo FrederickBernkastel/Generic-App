@@ -43,7 +43,7 @@
             android:paddingStart="20sp"
             android:paddingEnd="20sp"
 
-
+            android:maxLines="1"
             android:textSize="30sp"
             android:textColor="#000000"
             android:textAlignment="textEnd"
