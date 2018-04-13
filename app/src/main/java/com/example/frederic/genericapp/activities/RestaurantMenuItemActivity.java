@@ -37,6 +37,7 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
     int numOfSpecialRequestVisible = 0;
     int height,width;
     final int VIEWSPERSPECIALREQUESTROW = 4;
+    boolean hasChanged = false;
 
     TextView itemName;
     TextView itemDescription;
@@ -102,6 +103,9 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
 
         // Display previous order for menu item, if present
         display_previous_order(menuItem.id);
+
+        // Set hasChanged to false
+        hasChanged = false;
     }
 
 
@@ -110,6 +114,7 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
         int itemQuantity = Integer.valueOf(String.valueOf(itemQuantityTextview.getText()));
         if (itemQuantity>0){
             itemQuantityTextview.setText(String.valueOf(itemQuantity-1));
+            hasChanged = true;
 
             // Show description instead of price if needed
             if(itemQuantity==1){
@@ -133,6 +138,7 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
         // Increase item quantity if < 10
         int itemQuantity = Integer.valueOf(String.valueOf(itemQuantityTextview.getText()));
         if (itemQuantity<9){
+            hasChanged = true;
             itemQuantityTextview.setText(String.valueOf(itemQuantity + 1));
             String price = getItemPrice(menuItem,itemQuantity + 1);
 
@@ -202,15 +208,19 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
             prefManager.saveObj(getString(R.string.key_batch_orders),batchOrder,RestaurantMenuItemActivity.this);
 
             // Inform user that order has been added
-            String updateUser = String.format(Locale.US,"%d %s has been added to pending orders",itemQuantity,menuItem.name);
-            Toast.makeText(RestaurantMenuItemActivity.this,updateUser,Toast.LENGTH_LONG).show();
+            if (hasChanged) {
+                String updateUser = String.format(Locale.US, "%d %s has been updated in pending orders", itemQuantity, menuItem.name);
+                Toast.makeText(RestaurantMenuItemActivity.this, updateUser, Toast.LENGTH_LONG).show();
+            }
         } else {
             // Save batchOrder
             prefManager.saveObj(getString(R.string.key_batch_orders),batchOrder,RestaurantMenuItemActivity.this);
 
             // Inform user that no item ordered
-            String updateUser = String.format(Locale.US,"%s has been removed from pending orders",menuItem.name);
-            Toast.makeText(RestaurantMenuItemActivity.this,updateUser,Toast.LENGTH_LONG).show();
+            if (hasChanged) {
+                String updateUser = String.format(Locale.US, "%s has been removed from pending orders", menuItem.name);
+                Toast.makeText(RestaurantMenuItemActivity.this, updateUser, Toast.LENGTH_LONG).show();
+            }
         }
 
         // Go back to menu

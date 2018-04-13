@@ -16,10 +16,9 @@
         android:layout_alignBottom="@+id/main_activity_title"
 
         android:background="#FFFFFF"
-        android:alpha=".3">
+        android:alpha=".3"/>
 
 
-    </TextView>
     <TextView
         android:id="@+id/main_activity_title"
         android:layout_width="wrap_content"

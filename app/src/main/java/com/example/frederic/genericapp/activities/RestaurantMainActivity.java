@@ -127,7 +127,7 @@ public class RestaurantMainActivity extends AppCompatActivity implements AsyncFe
                     menu.imageURL.toString(),
                     ((ImageView) findViewById(R.id.restaurant_main_activity_image)),
                     width,
-                    height/8*3
+                    width/2
             );
         } catch (Exception e){
             System.out.println("FAIL");
