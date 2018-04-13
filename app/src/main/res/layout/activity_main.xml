@@ -8,16 +8,34 @@
 
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_centerHorizontal="true"
+
+        android:layout_alignTop="@+id/main_activity_title"
+        android:layout_alignBottom="@+id/main_activity_title"
+
+        android:background="#FFFFFF"
+        android:alpha=".3">
+
+
+    </TextView>
+    <TextView
         android:id="@+id/main_activity_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="80sp"
 
+
         android:text="@string/app_name"
         android:textSize="50sp"
         android:textColor="@android:color/background_dark"
 
+        android:shadowColor="#FFFFFF"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
 
         />
     <Button

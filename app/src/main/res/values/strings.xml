@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">歪厨 Crooked Cooks</string>
+    <string name="app_name">歪厨\nCrooked Cooks</string>
     <string name="main_activity_guest_button">Guest</string>
     <string name="button_del">⮨</string>
     <string name="insert_table_number">Insert Table Number</string>
