@@ -19,12 +19,12 @@
     <ImageView
         android:id="@+id/restaurant_main_activity_image"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="6" />
+        android:layout_height="wrap_content"
+         />
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="8"
+        android:layout_weight="9"
         android:scrollbars="vertical">
         <TableLayout
             android:layout_width="fill_parent"
@@ -45,11 +45,12 @@
 
                         android:src="@drawable/activity_restautant_main__icon_chef"
                         android:scaleType="fitCenter"
-                        android:padding="10dp"/>
+                        android:padding = "10dp"
+                        android:adjustViewBounds="true"/>
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="3"
+                        android:layout_weight="6"
                         android:layout_gravity="center_vertical"
 
                         android:text="@string/label_hot_dishes"
@@ -72,11 +73,12 @@
 
                         android:src="@drawable/activity_restautant_main__icon_menu"
                         android:scaleType="fitCenter"
-                        android:padding="10dp"/>
+                        android:padding = "10dp"
+                        android:adjustViewBounds="true"/>
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="3"
+                        android:layout_weight="6"
 
                         android:layout_gravity="center_vertical"
                         android:text="@string/label_menu"
@@ -99,11 +101,12 @@
 
                         android:src="@drawable/activity_restautant_main__icon_orders"
                         android:scaleType="fitXY"
-                        android:padding="10dp"/>
+                        android:padding = "10dp"
+                        android:adjustViewBounds="true"/>
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="3"
+                        android:layout_weight="6"
                         android:layout_gravity="center_vertical"
 
                         android:text="@string/label_orders"
@@ -126,11 +129,13 @@
 
                         android:src="@drawable/activity_restautant_main__icon_bill"
                         android:scaleType="fitXY"
-                        android:padding="10dp"/>
+                        android:padding = "10dp"
+                        android:adjustViewBounds="true"
+                        />
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="3"
+                        android:layout_weight="6"
                         android:layout_gravity="center_vertical"
 
                         android:text="@string/label_bill"

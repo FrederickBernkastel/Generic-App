@@ -8,7 +8,12 @@ public class FoodOrder{
     public String comment;
     FoodOrder(int foodId,String comment){
         this.foodId = foodId;
-        this.comment = comment;
+        // Check if comment is valid
+        if (comment.matches("[a-zA-Z0-9 \n!@#$%^&*(){}:;\"',./<>?\\[\\]]*")) {
+            this.comment = comment;
+        } else {
+            this.comment = "";
+        }
     }
     FoodOrder(int foodId){
         this.foodId = foodId;

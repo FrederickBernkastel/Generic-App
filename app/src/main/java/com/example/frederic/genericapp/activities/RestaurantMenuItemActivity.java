@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -46,6 +47,8 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
     ImageView itemImage;
     ImageView plusButton;
     ImageView minusButton;
+
+    final int MAX_COMMENT_CHARS = 140;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +137,7 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
             }
         }
     }
+
     void onPlusButtonClick(View v){
         // Increase item quantity if < 10
         int itemQuantity = Integer.valueOf(String.valueOf(itemQuantityTextview.getText()));
@@ -341,6 +345,7 @@ public class RestaurantMenuItemActivity extends AppCompatActivity {
         editText.setHint(R.string.special_request);
         editText.setSingleLine(false);
         editText.setVerticalScrollBarEnabled(true);
+        editText.setFilters(new InputFilter[] { new InputFilter.LengthFilter(MAX_COMMENT_CHARS)});
 
 
 
